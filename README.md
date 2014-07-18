@@ -28,7 +28,7 @@ Download and unzip to your WildStar Addon directory. Usually found at
 `C:\Users\<your windows user name>\AppData\Roaming\NCSOFT\WildStar\Addons`. You can also get to it 
 by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar or search bar.
 
-If downloading from github, you may need to rename the folder from `HousingTour-master` to 
+If downloaded from github, you may need to rename the extracted folder from `HousingTour-master` to  
 `HousingTour`.
 
 
@@ -45,10 +45,10 @@ Clicking on yourself will give the option "Go Home" which is exactly what it sou
 * `/HousingTour <PlayerName>` Take you to PlayerName's public property. Without a PlayerName the
   addon window will open. PlayerName is not case sensitive.
 * `/ht <PlayerName>` Shorter version of previous command.
-* `/ht ~` Sends Player to their house.
+* `/ht ~` Sends you home.
 
-It's a safe bet once the Unique Properties Searched number maxes out, the house you are looking for
-doesn't exist or isn't listed as public. This is also a decent estimate of the number of public 
+It's a safe bet once the Unique Properties Searched number stops increasing, the house you are 
+looking for isn't public or doesn't exist. This is also a decent estimate of the number of public 
 properties available to your faction on your server. 
 
 As of writing this, a house set to public can take up to a week before it's recognized by the 
@@ -61,7 +61,7 @@ name (spelled correctly), but it's not case sensitive.
 
 
 ### As a Guide
-It should be noted you'll have to join your own tour and set yourself as the Tour Guide.
+**You have to join your own tour and set yourself as the Tour Guide.**
 
 As a Tour Guide the right click menu option "Tour Home" will change to "Send Tour Here". This will 
 take you, and everyone with you set as their tour guide, to that player's home. Players not in 
@@ -70,19 +70,20 @@ housing will not be ported.
 * `/HousingTourGuide <PlayerName>` Will take you and anyone else in the housing zone with you set 
   as their Tour Guide to the named player's house if it's public.
 * `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
-* `/htg ~` Sends all Players to their respective houses.
+* `/htg ~` Sends all players to their respective houses.
 
 
 License
 -------
-The MIT License (MIT) Copyright (c) 2014 James Pryor (geekwagon.net) and K.L. Phan (klphan.com), see
-LICENSE.txt included with this addon, or [read this summary](https://www.tldrlegal.com/l/mit).
+This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
+K.L. Phan, see LICENSE.txt included with this addon, or 
+[read this summary](https://www.tldrlegal.com/l/mit).
 
 
 For the Future
 --------------
-There are more features than we can write down that I'd like to add to _Housing Tour_. Here is a
-short list of what we'd like to add in the near future.
+There are more features than we can write down that we'd like to add to _Housing Tour_. Here is a
+short list of what is in the near future.
 
 * A right clickable list of everyone in the tour (at least for the guide)
 * Speed dial, for example: `/ht 1` will take you to the player you've set as number 1.
