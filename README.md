@@ -24,11 +24,12 @@ commands tend to be tested more throughly than the gui.
 
 Install
 -------
-Will add more detailed instructions based on where this addon is available for download.
-
 Download and unzip to your WildStar Addon directory. Usually found at 
 `C:\Users\<your windows user name>\AppData\Roaming\NCSOFT\WildStar\Addons`. You can also get to it 
 by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar or search bar.
+
+If downloading from github, you may need to rename the folder from `HousingTour-master` to 
+`HousingTour`.
 
 
 How to Use
