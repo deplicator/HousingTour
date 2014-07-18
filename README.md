@@ -3,11 +3,11 @@ Kael's Housing Tour
 This is still a very early version, please let me know of bugs at james@geekwagon.net.
 
 **Important Notice**
-This mod will automatically port you to a public house _only if_ (1) the addon is enabled, _only 
-if_ (2) you are in player housing, _only if_ (3) you are opted in (check box), and _only if_ (4) 
-you have typed in a Tour Guide's name. Once you meet those _four_ requirements a bright red message
-will display in the addon's window and in your chat debug. At this point the Tour Guide can port 
-you without further warning.
+This mod will automatically port you to a public house _only if_ (1) the addon is installed and 
+enabled, _only if_ (2) you are in player housing, _only if_ (3) you are opted in (check box), and 
+_only if_ (4) you have typed in a Tour Guide's name. Once you meet those _four_ requirements a red
+message will display in the addon's window. At this point the Tour Guide can port you without 
+further warning.
 
 
 Why
