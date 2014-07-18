@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Addon Author="Deplicator@Stormtalon" APIVersion="9" Name="Kael's Housing Tour" Description="Tour public houses, solo or with a guide.">
+    <Script Name="HousingTour.lua"/>
+    <Form Name="HousingTour.xml"/>
+</Addon>
