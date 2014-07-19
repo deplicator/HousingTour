@@ -84,19 +84,31 @@ use:
 The second parameter, [silent], is an optional boolean value. If set to true the Housing Tour GUI
 will not show up.
 
-Other addons can get for who is being searched with:
+Other addons can get use the following two triggers:
 
     Apollo.RegisterEventHandler("HT-PropertySearch", "yourFunction", self)
-
-A string will be passed to your function of the player name that was searched. This event is fired
-if the player goes home, goes to a neighbor, or searches for a public property using Housing Tour.
-
-Other addons can get a successful search with:
+    
+A table will be passed to your function that is `{strSearchFor = "PlayerName"}`. I know it's kind of
+pointless to be a table, but this gives options for future expansion with less breakage.
 
     Apollo.RegisterEventHandler("HT-PropertySearchSuccess", "yourFunction", self)
 
-For this one two strings are passed to your function. The first is player name and the second is 
-"home", "neighbor", or "public" depending on which method was used to get to that player's property.
+This event also passes a table to your function. This one has two strings; `strSentTo` is the player
+name that was searched for. The other is `strType` and it will have "home", "neighbor", or "public"
+depending on the method that got the player to the property.
+
+Here is a quick example function for both events:
+
+    function yourFunction(tData)
+        if tData.strSearchFor ~= nil then
+            Print("searched for " .. tData.strSearchFor)
+        end
+        if tData.strSentTo ~=nil then
+            Print(tData.strSentTo .. " : " .. tData.strType)
+        end
+        return
+    end
+
 
 
 License

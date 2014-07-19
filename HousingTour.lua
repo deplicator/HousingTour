@@ -183,7 +183,7 @@ end
 function HousingTour:PropertySearch(strInputPlayer)
 
     -- Custom event can be picked up by event handlers in another addon.
-    Event_FireGenericEvent("HT-PropertySearch", strInputPlayer)
+    Event_FireGenericEvent("HT-PropertySearch", {strSearchFor = strInputPlayer})
     
     self.strPlayerSearch = string.lower(strInputPlayer)
 
@@ -191,7 +191,7 @@ function HousingTour:PropertySearch(strInputPlayer)
     if self.strPlayerSearch == string.lower(GameLib.GetPlayerUnit():GetName())
     or self.strPlayerSearch == "~" then
         HousingLib.RequestTakeMeHome()
-        Event_FireGenericEvent("HT-PropertySearchSuccess", strInputPlayer, "home")
+        Event_FireGenericEvent("HT-PropertySearchSuccess", {strSentTo = GameLib.GetPlayerUnit():GetName(), strType = "home"})
         self.wndMain:FindChild("StatusMsg"):SetText("Welcome home.")
         if self.bTourOpt then
             self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your place!")
@@ -205,7 +205,7 @@ function HousingTour:PropertySearch(strInputPlayer)
         for index = 1, #arNeighbors do
             if string.lower(arNeighbors[index].strCharacterName) == self.strPlayerSearch then
                 HousingLib.VisitNeighborResidence(arNeighbors[index].nId)
-                Event_FireGenericEvent("HT-PropertySearchSuccess", strInputPlayer, "neighbor")
+                Event_FireGenericEvent("HT-PropertySearchSuccess", {strSentTo = strInputPlayer, strType = "neighbor"})
                 self.wndMain:FindChild("StatusMsg"):SetText(arNeighbors[index].strCharacterName .. " is your neighbor!")
                 if self.bTourOpt then
                     self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your neighbor " .. arNeighbors[index].strCharacterName .. ".")
@@ -251,7 +251,7 @@ function HousingTour:PublicPropertySearch()
             self.nTotalSearches = 0
             self.tUnique = {}
             HousingLib.RequestRandomVisit(arResidences[i].nId)
-            Event_FireGenericEvent("HT-PropertySearchSuccess", strInputPlayer, "public")
+            Event_FireGenericEvent("HT-PropertySearchSuccess", {strSentTo = strInputPlayer, strType = "public"})
             self.wndMain:FindChild("StatusMsg"):SetText("You have arrived at " .. strPlayerFound .. "'s house!")
             if self.bTourOpt then
                 self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to " .. strPlayerFound .. "'s property.")
