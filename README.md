@@ -9,6 +9,7 @@ _only if_ (4) you have typed in a Tour Guide's name. Once you meet those _four_ 
 message will display in the addon's window. At this point the Tour Guide can port you without 
 further warning.
 
+![Screenshot](http://geekwagon.net/projects/HousingTour/khtss.png)
 
 Why
 ---
