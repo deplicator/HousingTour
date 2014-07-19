@@ -74,8 +74,7 @@ housing will not be ported.
 * `/htg ~` Sends all players to their respective houses.
 
 
-For other Addon's
------------------
+### With other Addon's
 Other addon's can make use of Kael's Housing Tour search feature. To go to another players property
 use:
 
