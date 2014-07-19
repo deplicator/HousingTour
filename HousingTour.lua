@@ -95,7 +95,6 @@ function HousingTour:OnLoad()
             self:SendHorde(nil, self.contextMenu.strTarget)
         else
             oldContextClick(context, eButtonType)
-            Print(eButtonType)
         end
     end
     
@@ -333,11 +332,6 @@ function HousingTour:OnIncomingMessage(channel, tMsg)
             self.wndMain:Invoke()
             self.wndMain:FindChild("TourMsg"):SetText(tMsg.strGuide .. " is attempting to send you to " .. tMsg.strSearch .. "'s property.")
             self:PropertySearch(tMsg.strSearch)
-            return
-            
-        -- for diag
-        else
-            Print("You received a message, but not opted into " .. tMsg.strGuide .. "'s tour.")
             return
         end
     end
