@@ -98,7 +98,7 @@ function HousingTour:OnLoad()
         end
     end
     
-    Apollo.RegisterEventHandler("HousingRandomResidenceListRecieved", "PublicPropertySearch", self)
+    Apollo.RegisterEventHandler("HousingRandomResidenceListRecieved", "PublicPropertySearch", self)    
     
     -- Change channel name for testing.
     self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-live", "OnIncomingMessage", self)
@@ -144,10 +144,20 @@ end
 -----------------------------------------------------------------------------------------------
 
 -- Single player use slash commands.
--- @param wut               Some kind of place holder.
+-- @param strCommand        Slash command passed.
 -- @param strInputPlayer    The player name to search for.
-function HousingTour:OnHousingTourOn(wut, strInputPlayer)
-    self.wndMain:Invoke()
+-- @param bSilent           Optional parameter, if set to true gui will not pop up.
+function HousingTour:OnHousingTourOn(strCommand, strInputPlayer, bSilent)
+
+    if bSilent == nil then
+        bSilent = false
+    end
+    
+    if not bSilent then
+        self.wndMain:Invoke()
+    end
+    
+
     self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: 0")
     self.wndMain:FindChild("TourMsg"):SetText("")
 
@@ -172,12 +182,16 @@ end
 -- @param strInputPlayer    The player name to search for.
 function HousingTour:PropertySearch(strInputPlayer)
 
+    -- Custom event can be picked up by event handlers in another addon.
+    Event_FireGenericEvent("HT-PropertySearch", strInputPlayer)
+    
     self.strPlayerSearch = string.lower(strInputPlayer)
 
     -- Handle searching for yourself.
     if self.strPlayerSearch == string.lower(GameLib.GetPlayerUnit():GetName())
     or self.strPlayerSearch == "~" then
         HousingLib.RequestTakeMeHome()
+        Event_FireGenericEvent("HT-PropertySearchSuccess", strInputPlayer, "home")
         self.wndMain:FindChild("StatusMsg"):SetText("Welcome home.")
         if self.bTourOpt then
             self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your place!")
@@ -191,6 +205,7 @@ function HousingTour:PropertySearch(strInputPlayer)
         for index = 1, #arNeighbors do
             if string.lower(arNeighbors[index].strCharacterName) == self.strPlayerSearch then
                 HousingLib.VisitNeighborResidence(arNeighbors[index].nId)
+                Event_FireGenericEvent("HT-PropertySearchSuccess", strInputPlayer, "neighbor")
                 self.wndMain:FindChild("StatusMsg"):SetText(arNeighbors[index].strCharacterName .. " is your neighbor!")
                 if self.bTourOpt then
                     self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your neighbor " .. arNeighbors[index].strCharacterName .. ".")
@@ -236,6 +251,7 @@ function HousingTour:PublicPropertySearch()
             self.nTotalSearches = 0
             self.tUnique = {}
             HousingLib.RequestRandomVisit(arResidences[i].nId)
+            Event_FireGenericEvent("HT-PropertySearchSuccess", strInputPlayer, "public")
             self.wndMain:FindChild("StatusMsg"):SetText("You have arrived at " .. strPlayerFound .. "'s house!")
             if self.bTourOpt then
                 self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to " .. strPlayerFound .. "'s property.")
@@ -261,9 +277,9 @@ end
 
 
 -- Tour Guide use slash commands.
--- @param wut               Some kind of place holder.
+-- @param strCommand           
 -- @param strInputPlayer    The player name to search for.
-function HousingTour:SendHorde(wut, strInputPlayer)
+function HousingTour:SendHorde(strCommand, strInputPlayer)
     self.wndMain:Invoke()
     self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: 0")
     self.wndMain:FindChild("TourMsg"):SetText("")

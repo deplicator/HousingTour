@@ -61,7 +61,7 @@ name (spelled correctly), but it's not case sensitive.
 
 
 ### As a Guide
-**You have to join your own tour and set yourself as the Tour Guide.**
+**You join a tour and set yourself as the Tour Guide.**
 
 As a Tour Guide the right click menu option "Tour Home" will change to "Send Tour Here". This will 
 take you, and everyone with you set as their tour guide, to that player's home. Players not in 
@@ -71,6 +71,32 @@ housing will not be ported.
   as their Tour Guide to the named player's house if it's public.
 * `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
 * `/htg ~` Sends all players to their respective houses.
+
+
+For other Addon's
+-----------------
+Other addon's can make use of Kael's Housing Tour search feature. To go to another players property
+use:
+
+    local ht = Apollo.GetAddon("HousingTour")
+    ht:PropertySearch("PlayerName", [silent])
+
+The second parameter, [silent], is an optional boolean value. If set to true the Housing Tour GUI
+will not show up.
+
+Other addons can get for who is being searched with:
+
+    Apollo.RegisterEventHandler("HT-PropertySearch", "yourFunction", self)
+
+A string will be passed to your function of the player name that was searched. This event is fired
+if the player goes home, goes to a neighbor, or searches for a public property using Housing Tour.
+
+Other addons can get a successful search with:
+
+    Apollo.RegisterEventHandler("HT-PropertySearchSuccess", "yourFunction", self)
+
+For this one two strings are passed to your function. The first is player name and the second is 
+"home", "neighbor", or "public" depending on which method was used to get to that player's property.
 
 
 License
