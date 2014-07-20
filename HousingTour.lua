@@ -114,12 +114,21 @@ function HousingTour:OnDocLoaded()
 
 	if self.xmlDoc ~= nil and self.xmlDoc:IsLoaded() then
 	    self.wndMain = Apollo.LoadForm(self.xmlDoc, "HousingTourForm", nil, self)
+        self.wndShowAll = Apollo.LoadForm(self.xmlDoc, "PublicListForm", nil, self)
+        
 		if self.wndMain == nil then
 			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.")
 			return
 		end
 
+        if self.wndShowAll == nil then
+            Apollo.AddAddonErrorText(self, "Could not load the show all window for some reason.")
+            Print("error")
+            return
+        end
+
 	    self.wndMain:Show(false, true)
+        self.wndShowAll:Show(false, true)
 
 		-- if the xmlDoc is no longer needed, you should set it to nil
 		-- self.xmlDoc = nil
@@ -386,9 +395,10 @@ end
 -----------------------------------------------------------------------------------------------
 -- HousingTourForm Functions
 -----------------------------------------------------------------------------------------------
--- When the OK or Close button is clicked
+-- When the OK or Close button is clicked.
 function HousingTour:OnOK()
-	self.wndMain:Close() -- hide the window
+	self.wndMain:Close()
+    self.wndShowAll:Close()
     self.bFind = false
 end
 
@@ -449,6 +459,15 @@ function HousingTour:OnGuideChangeClose()
     self.wndMain:FindChild("ChangeGuideWindow"):Show(false)
 end
 
+-- When the "Show All" button is clicked.
+function HousingTour:OnPublicList()
+    self.wndShowAll:Invoke()
+end
+
+-- When the close button is clicked on the public list window.
+function HousingTour:OnPublicListClose()
+    self.wndShowAll:Close()
+end
 
 
 -----------------------------------------------------------------------------------------------
