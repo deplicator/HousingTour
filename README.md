@@ -25,12 +25,14 @@ commands tend to be tested more throughly than the gui.
 
 Install
 -------
-Download and unzip to your WildStar Addon directory. Usually found at 
+This addon can also be downloaded from [Curse](http://www.curse.com/ws-addons/wildstar/222538-kaels-housing-tour).
+
+If downloading from GitHub be sure to download the master branch. You may need to rename the 
+extracted folder from `HousingTour-master` to `HousingTour`.
+
+After downloading, extract to the WildStar Addon directory. Usually found at 
 `C:\Users\<your windows user name>\AppData\Roaming\NCSOFT\WildStar\Addons`. You can also get to it 
 by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar or search bar.
-
-If downloaded from github, you may need to rename the extracted folder from `HousingTour-master` to  
-`HousingTour`.
 
 
 How to Use
