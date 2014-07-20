@@ -123,7 +123,11 @@ For the Future
 There are more features than we can write down that we'd like to add to _Housing Tour_. Here is a
 short list of what is in the near future.
 
-* A right clickable list of everyone in the tour (at least for the guide)
+* ~~A context (right click) menu.~~
+* ~~Event triggers to support other addons.~~
+* ~~Auto stop searching after set number of non-unique property searches.~~
+
+* Visual searching indicator.
 * Speed dial, for example: `/ht 1` will take you to the player you've set as number 1.
 * Auto neighbor speed dial, for example: `/ht n1` will take you to your first neighbor... in some
   order.
