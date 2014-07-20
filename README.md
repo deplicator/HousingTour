@@ -131,5 +131,6 @@ short list of what is in the near future.
 * Speed dial, for example: `/ht 1` will take you to the player you've set as number 1.
 * Auto neighbor speed dial, for example: `/ht n1` will take you to your first neighbor... in some
   order.
+* More awesome public search.
 * History of where the tour went, so people can go back and see the cool things again.
 
