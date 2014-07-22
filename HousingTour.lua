@@ -28,12 +28,14 @@ function HousingTour:new(o)
     self.__index = self
 
     -- initialize variables here
-    self.wndMain = nil
+    self.wndMain = nil          -- Main form.
+    self.tOptions = {}          -- Table of set options.
     self.strPlayerSearch = ""   -- Player name searched in lower case used for searching.
     self.bFind = false          -- Boolean to halt searching.
-    self.tUnique = {}           -- Table of unique player names with housing set to public.
+    self.tPublicList = {}       -- Table of unique player names with housing set to public.
     self.nTotalSearches = 0     -- Number of searches done.
-    self.nRepeteNumber = 0
+    self.nRepeteNumber = 0      -- Number of searches done when nothing unique added to tPublicList.
+    
 
     self.bTourOpt = false       -- Boolean to option into tour, must be true for auto-porting.
     self.strGuide = ""          -- Tour guide name, must have contents for auto-porting.
@@ -91,9 +93,9 @@ function HousingTour:OnLoad()
     local oldContextClick = self.contextMenu.ProcessContextClick
     self.contextMenu.ProcessContextClick = function(context, eButtonType)
         if eButtonType == "BtnHousingTour" then
-            self:OnHousingTourOn(nil, self.contextMenu.strTarget)
+            self:OnHousingTourOn('ht', self.contextMenu.strTarget)
         elseif eButtonType == "BtnGuideTour" then
-            self:SendHorde(nil, self.contextMenu.strTarget)
+            self:OnHousingTourOn('htg', self.contextMenu.strTarget)
         else
             oldContextClick(context, eButtonType)
         end
@@ -103,7 +105,7 @@ function HousingTour:OnLoad()
 
     -- Change channel name for testing.
     self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-live", "OnIncomingMessage", self)
-
+    
 end
 
 
@@ -114,21 +116,21 @@ function HousingTour:OnDocLoaded()
 
 	if self.xmlDoc ~= nil and self.xmlDoc:IsLoaded() then
 	    self.wndMain = Apollo.LoadForm(self.xmlDoc, "HousingTourForm", nil, self)
-        self.wndShowAll = Apollo.LoadForm(self.xmlDoc, "PublicListForm", nil, self)
+        self.wndPublicList = Apollo.LoadForm(self.xmlDoc, "PublicListForm", nil, self)
         
 		if self.wndMain == nil then
 			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.")
 			return
 		end
 
-        if self.wndShowAll == nil then
+        if self.wndPublicList == nil then
             Apollo.AddAddonErrorText(self, "Could not load the show all window for some reason.")
             Print("error")
             return
         end
 
 	    self.wndMain:Show(false, true)
-        self.wndShowAll:Show(false, true)
+        self.wndPublicList:Show(false, true)
 
 		-- if the xmlDoc is no longer needed, you should set it to nil
 		-- self.xmlDoc = nil
@@ -143,8 +145,10 @@ function HousingTour:OnDocLoaded()
 		Apollo.RegisterSlashCommand("HTG",              "OnHousingTourOn", self)
 		Apollo.RegisterSlashCommand("htg",              "OnHousingTourOn", self)
 
-		-- Do additional Addon initialization here
-
+        -- Restore saved options.
+        if self.tOptions ~= nil then
+            self.wndMain:FindChild('SilentModeCheckbox'):SetCheck(self.tOptions['silent'])
+        end
 	end
 end
 
@@ -162,7 +166,7 @@ function HousingTour:OnHousingTourOn(strCommand, strInputPlayer)
 
     -- When single player commands are used, start search.
     if string.lower(strCommand) == "housingtour" or string.lower(strCommand) == "ht" then
-        self:PropertySearch(strInputPlayer, false)
+        self:PropertySearch(strInputPlayer, self.tOptions['silent'])
 
     -- When tour guide commands are used.
     elseif string.lower(strCommand) == "housingtourguide" or string.lower(strCommand) == "htg" then
@@ -181,7 +185,7 @@ function HousingTour:OnHousingTourOn(strCommand, strInputPlayer)
             self.wndMain:FindChild("StatusMsg"):SetText("Type /htg PlayerName to search for and visit a public property.")
             return
 
-            -- Send message to the masses to begin search!
+        -- Send message to the masses to begin search!
         else
             self.wndMain:FindChild("StatusMsg"):SetText("Sending horde to " .. strInputPlayer .. ".")
             local tToSend = {}
@@ -209,7 +213,7 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
     self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: 0")
     self.wndMain:FindChild("TourMsg"):SetText("")
 
-    -- Hide main form if silent option is off and not on a tour (tour will always show main form).
+    -- Hide main form if bSilent set to true. Main form will always show while on a tour.
     self.wndMain:Show(not bSilent or self.bTourOpt)
 
     -- Alert user if they are not in player housing zone.
@@ -219,6 +223,7 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
 
     -- Check for player search string.
     elseif strInputPlayer == nil or strInputPlayer == "" then
+        self.wndMain:Show(true) -- If no search string is passed always show main form.
         self.wndMain:FindChild("StatusMsg"):SetText("Type /ht PlayerName to search for and visit a public property.")
         return
     end
@@ -269,7 +274,7 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
         self.wndMain:FindChild("StatusMsg"):SetText("Searching for " .. strInputPlayer .. ".")
 
         -- Setup global variables.
-        self.tUnique = {}
+        self.tPublicList = {}
         self.nTotalSearches = 0
         self.bFind = true
 
@@ -284,14 +289,12 @@ end
 -- called.
 function HousingTour:PublicPropertySearch()
 
-	if self.bFind == false then
+	if not self.bFind then
         return
 	end
 
     -- Boolean to determine when player is found.
 	local bFound = false
-    
-    
 
     -- GetRandomResidenceList always returns 25 random residences (as far as I can tell).
 	local tResidences = HousingLib.GetRandomResidenceList()
@@ -300,8 +303,8 @@ function HousingTour:PublicPropertySearch()
         local nIdFound = tResidences[i].nId
 
         -- Add found player to a table.
-        if self.tUnique[strPlayerFound] == nil then
-            self.tUnique[strPlayerFound] = 1
+        if self.tPublicList[strPlayerFound] == nil then
+            self.tPublicList[strPlayerFound] = 1
             self.nRepeteNumber = 0
         else
             self.nRepeteNumber = self.nRepeteNumber + 1
@@ -312,7 +315,7 @@ function HousingTour:PublicPropertySearch()
             bFound = true
             self.bFind = false
             self.nTotalSearches = 0
-            self.tUnique = {}
+            self.tPublicList = {}
             self.nRepeteNumber = 0
             HousingLib.RequestRandomVisit(tResidences[i].nId)
             Event_FireGenericEvent("HT-PropertySearchSuccess",
@@ -329,9 +332,9 @@ function HousingTour:PublicPropertySearch()
   	end
 
     -- Count properties searched so far.
-    if bFound == false then
+    if not bFound then
         local nUnique = 0
-        for _ in pairs(self.tUnique) do
+        for _ in pairs(self.tPublicList) do
             nUnique = nUnique + 1
         end
 
@@ -391,15 +394,47 @@ function HousingTour:OnIncomingMessage(channel, tMsg)
 end
 
 
+function HousingTour:OnSave(eSaveType)
+    if eSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
+        local tSave = self.tOptions
+        return tSave
+    else
+        return
+    end
+end
+
+
+function HousingTour:OnRestore(eSaveType, tData)
+    if eSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
+        self.tOptions = tData
+        return
+    else
+        return
+    end
+end
+
 
 -----------------------------------------------------------------------------------------------
 -- HousingTourForm Functions
 -----------------------------------------------------------------------------------------------
 -- When the OK or Close button is clicked.
 function HousingTour:OnOK()
+    self:OnSave()
 	self.wndMain:Close()
-    self.wndShowAll:Close()
+    self.wndPublicList:Close()
     self.bFind = false
+end
+
+
+-- When the Options box is checked.
+function HousingTour:OnOptionsCheck()
+    self.wndMain:FindChild("OptionsForm"):Show(true)
+end
+
+
+-- When the Options box is UNchecked.
+function HousingTour:OnOptionsUncheck()
+    self.wndMain:FindChild("OptionsForm"):Show(false)
 end
 
 
@@ -435,7 +470,7 @@ end
 
 -- When "Change Guide" button is clicked.
 function HousingTour:OnChangeGuide()
-    self.wndMain:FindChild("ChangeGuideWindow"):Show(true)
+    self.wndMain:FindChild("ChangeGuideForm"):Show(true)
 
     if self.strGuide == "" then
         self.wndMain:FindChild("ChangeGuideBox"):SetText("Kaelish")
@@ -449,25 +484,38 @@ end
 function HousingTour:OnGuideChangeSubmit()
     self.strGuide = self.wndMain:FindChild("ChangeGuideBox"):GetText()
     self.wndMain:FindChild("GuideTextBox"):SetText(self.strGuide)
-    self.wndMain:FindChild("ChangeGuideWindow"):Show(false)
+    self.wndMain:FindChild("ChangeGuideForm"):Show(false)
     self.wndMain:FindChild("TourMsg"):SetText("You will be ported to public housing with " .. self.strGuide .. ".")
 end
 
 
 -- When the "Change Guide Close" button is clicked.
 function HousingTour:OnGuideChangeClose()
-    self.wndMain:FindChild("ChangeGuideWindow"):Show(false)
+    self.wndMain:FindChild("ChangeGuideForm"):Show(false)
 end
 
 -- When the "Show All" button is clicked.
 function HousingTour:OnPublicList()
-    self.wndShowAll:Invoke()
+    self.wndPublicList:Invoke()
 end
 
 -- When the close button is clicked on the public list window.
 function HousingTour:OnPublicListClose()
-    self.wndShowAll:Close()
+    self.wndPublicList:Close()
 end
+
+
+-- When the silent mode box is checked.
+function HousingTour:OnSilentModeCheck()
+    self.tOptions['silent'] = true;
+end
+
+
+-- When the silent mode box is UNchecked.
+function HousingTour:OnSilentModeUncheck()
+    self.tOptions['silent'] = false;
+end
+
 
 
 -----------------------------------------------------------------------------------------------

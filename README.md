@@ -25,12 +25,14 @@ commands tend to be tested more throughly than the gui.
 
 Install
 -------
-Download and unzip to your WildStar Addon directory. Usually found at 
+This addon can also be downloaded from [Curse](http://www.curse.com/ws-addons/wildstar/222538-kaels-housing-tour).
+
+If downloading from GitHub be sure to download the master branch. You may need to rename the 
+extracted folder from `HousingTour-master` to `HousingTour`.
+
+After downloading, extract to the WildStar Addon directory. Usually found at 
 `C:\Users\<your windows user name>\AppData\Roaming\NCSOFT\WildStar\Addons`. You can also get to it 
 by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar or search bar.
-
-If downloaded from github, you may need to rename the extracted folder from `HousingTour-master` to  
-`HousingTour`.
 
 
 How to Use
@@ -72,6 +74,14 @@ housing will not be ported.
   as their Tour Guide to the named player's house if it's public.
 * `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
 * `/htg ~` Sends all players to their respective houses.
+
+
+### Now with an Option
+The silent mode check box will keep the main form from popping up every time you do a 
+`/ht PlayerName` search. The form will still come up when you type `/ht` or `/htg`. The option is
+saved account wide.
+
+Maybe in the future we'll have two options.
 
 
 ### With other Addon's
@@ -126,6 +136,7 @@ short list of what is in the near future.
 * ~~A context (right click) menu.~~
 * ~~Event triggers to support other addons.~~
 * ~~Auto stop searching after set number of non-unique property searches.~~
+* ~~Keep the gui from popping up _all_ the time~~
 
 * Visual searching indicator.
 * Speed dial, for example: `/ht 1` will take you to the player you've set as number 1.
@@ -133,4 +144,3 @@ short list of what is in the near future.
   order.
 * More awesome public search.
 * History of where the tour went, so people can go back and see the cool things again.
-
