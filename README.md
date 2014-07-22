@@ -143,4 +143,5 @@ short list of what is in the near future.
 * Auto neighbor speed dial, for example: `/ht n1` will take you to your first neighbor... in some
   order.
 * More awesome public search.
+* Announce Be My Guest achievement to tour.
 * History of where the tour went, so people can go back and see the cool things again.
