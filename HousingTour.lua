@@ -29,16 +29,16 @@ function HousingTour:new(o)
 
     -- initialize variables here
     self.wndMain = nil          -- Main form.
-    self.tOptions = {}          -- Table of set options.
     self.strPlayerSearch = ""   -- Player name searched in lower case used for searching.
     self.bFind = false          -- Boolean to halt searching.
     self.tPublicList = {}       -- Table of unique player names with housing set to public.
     self.nTotalSearches = 0     -- Number of searches done.
     self.nRepeteNumber = 0      -- Number of searches done when nothing unique added to tPublicList.
-    
 
     self.bTourOpt = false       -- Boolean to option into tour, must be true for auto-porting.
     self.strGuide = ""          -- Tour guide name, must have contents for auto-porting.
+    
+    self.tOptions = {}          -- Table for saved options.
     return o
 end
 
@@ -87,7 +87,6 @@ function HousingTour:OnLoad()
         end
         oldRedrawAll(context)
     end
-
 
     -- catch the event fired when the player clicks the context menu
     local oldContextClick = self.contextMenu.ProcessContextClick
@@ -145,11 +144,12 @@ function HousingTour:OnDocLoaded()
 		Apollo.RegisterSlashCommand("HTG",              "OnHousingTourOn", self)
 		Apollo.RegisterSlashCommand("htg",              "OnHousingTourOn", self)
 
-        -- Restore saved options.
-        if self.tOptions ~= nil then
-            self.wndMain:FindChild('SilentModeCheckbox'):SetCheck(self.tOptions['silent'])
-        end
-	end
+        -- Set defaults and restore saved options.
+        if self.tOptions.bSilentMode == nil then self.tOptions.bSilentMode = false end
+        if self.tOptions.bCmdLineOut == nil then self.tOptions.bCmdLineOut = false end
+        self.wndMain:FindChild('SilentModeCheckbox'):SetCheck(self.tOptions['bSilentMode'])
+        self.wndMain:FindChild('CmdLineOutCheckbox'):SetCheck(self.tOptions['bCmdLineOut'])
+ 	end
 end
 
 -----------------------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ function HousingTour:OnHousingTourOn(strCommand, strInputPlayer)
 
     -- When single player commands are used, start search.
     if string.lower(strCommand) == "housingtour" or string.lower(strCommand) == "ht" then
-        self:PropertySearch(strInputPlayer, self.tOptions['silent'])
+        self:PropertySearch(strInputPlayer, self.tOptions['bSilentMode'])
 
     -- When tour guide commands are used.
     elseif string.lower(strCommand) == "housingtourguide" or string.lower(strCommand) == "htg" then
@@ -210,7 +210,8 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
     end
 
     -- Initial messages.
-    self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: 0")
+    self.wndMain:FindChild("StatusMsg"):SetText("")
+    self.wndMain:FindChild("SearchedMsg"):SetText("Search not required.")
     self.wndMain:FindChild("TourMsg"):SetText("")
 
     -- Hide main form if bSilent set to true. Main form will always show while on a tour.
@@ -218,13 +219,16 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
 
     -- Alert user if they are not in player housing zone.
     if not HousingLib.IsHousingWorld() then
-        self.wndMain:FindChild("StatusMsg"):SetText("You must be in player housing to use this addon.")
-        return
-
+        self.wndMain:FindChild("StatusMsg"):SetText("You must be in player housing to use this addon.  ")
+        
+        -- Command line output.
+        if(self.tOptions['bCmdLineOut']) then Print("You must be in player housing to use this addon.") end
+    end
+    
     -- Check for player search string.
-    elseif strInputPlayer == nil or strInputPlayer == "" then
+    if strInputPlayer == nil or strInputPlayer == "" then
         self.wndMain:Show(true) -- If no search string is passed always show main form.
-        self.wndMain:FindChild("StatusMsg"):SetText("Type /ht PlayerName to search for and visit a public property.")
+        self.wndMain:FindChild("StatusMsg"):SetText(self.wndMain:FindChild("StatusMsg"):GetText() .. "Type /ht PlayerName to search for and visit a public property.")
         return
     end
 
@@ -242,6 +246,9 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
                                {strSentTo = GameLib.GetPlayerUnit():GetName(),
                                 strType = "home"})
         self.wndMain:FindChild("StatusMsg"):SetText("Welcome home.")
+        
+        -- Command line output.
+        if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. GameLib.GetPlayerUnit():GetName()) end
 
         -- Tour message.
         if self.bTourOpt then
@@ -252,18 +259,21 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
     else
 
         -- Check if search is a neighbor... sound faster than random public searches.
-        local arNeighbors = HousingLib.GetNeighborList()
-        for index = 1, #arNeighbors do
-            if string.lower(arNeighbors[index].strCharacterName) == self.strPlayerSearch then
-                HousingLib.VisitNeighborResidence(arNeighbors[index].nId)
+        local tNeighbors = HousingLib.GetNeighborList()
+        for index = 1, #tNeighbors do
+            if string.lower(tNeighbors[index].strCharacterName) == self.strPlayerSearch then
+                HousingLib.VisitNeighborResidence(tNeighbors[index].nId)
                 Event_FireGenericEvent("HT-PropertySearchSuccess",
                                        {strSentTo = strInputPlayer,
                                         strType = "neighbor"})
-                self.wndMain:FindChild("StatusMsg"):SetText(arNeighbors[index].strCharacterName .. " is your neighbor!")
+                self.wndMain:FindChild("StatusMsg"):SetText(tNeighbors[index].strCharacterName .. " is your neighbor!")
+                
+                -- Command line output.
+                if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. tNeighbors[index].strCharacterName) end
 
                 -- Tour message.
                 if self.bTourOpt then
-                    self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your neighbor " .. arNeighbors[index].strCharacterName .. ".")
+                    self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your neighbor " .. tNeighbors[index].strCharacterName .. ".")
                 end
 
                 return
@@ -394,8 +404,12 @@ function HousingTour:OnIncomingMessage(channel, tMsg)
 end
 
 
-function HousingTour:OnSave(eSaveType)
-    if eSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
+function HousingTour:OnSave(tSaveType)
+    
+    if tSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
+        Print(tSaveType)
+        Print(GameLib.CodeEnumAddonSaveLevel.Account)
+        
         local tSave = self.tOptions
         return tSave
     else
@@ -404,13 +418,9 @@ function HousingTour:OnSave(eSaveType)
 end
 
 
-function HousingTour:OnRestore(eSaveType, tData)
-    if eSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
-        self.tOptions = tData
-        return
-    else
-        return
-    end
+function HousingTour:OnRestore(tSaveType, tData)
+    Print("data loaded")
+    self.tOptions = tData
 end
 
 
@@ -419,9 +429,11 @@ end
 -----------------------------------------------------------------------------------------------
 -- When the OK or Close button is clicked.
 function HousingTour:OnOK()
-    self:OnSave()
+    self:OnSave(2)
 	self.wndMain:Close()
     self.wndPublicList:Close()
+    self.wndMain:FindChild("OptionsForm"):Show(false)
+    self.wndMain:FindChild("OptionsCheckbox"):SetCheck(false)
     self.bFind = false
 end
 
@@ -435,6 +447,7 @@ end
 -- When the Options box is UNchecked.
 function HousingTour:OnOptionsUncheck()
     self.wndMain:FindChild("OptionsForm"):Show(false)
+    self:OnSave(2)
 end
 
 
@@ -505,17 +518,24 @@ function HousingTour:OnPublicListClose()
 end
 
 
--- When the silent mode box is checked.
+-- bSilentMode Mode checkbox.
 function HousingTour:OnSilentModeCheck()
-    self.tOptions['silent'] = true;
+    self.tOptions['bSilentMode'] = true
 end
 
-
--- When the silent mode box is UNchecked.
 function HousingTour:OnSilentModeUncheck()
-    self.tOptions['silent'] = false;
+    self.tOptions['bSilentMode'] = false
 end
 
+
+-- Command Line Output checkbox.
+function HousingTour:OnCmdLineOutCheck()
+    self.tOptions['bCmdLineOut'] = true
+end
+
+function HousingTour:OnCmdLineOutUncheck()
+    self.tOptions['bCmdLineOut'] = false
+end
 
 
 -----------------------------------------------------------------------------------------------

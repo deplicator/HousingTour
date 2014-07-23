@@ -76,12 +76,16 @@ housing will not be ported.
 * `/htg ~` Sends all players to their respective houses.
 
 
-### Now with an Option
-The silent mode check box will keep the main form from popping up every time you do a 
-`/ht PlayerName` search. The form will still come up when you type `/ht` or `/htg`. The option is
-saved account wide.
+### Now with Options
+**Silent Mode** will keep the main form from popping up every time you attempt to go to a players 
+house from the command line (ie `/ht PlayerName`). The form still comes up when using `/ht` or 
+`/htg`. 
 
-Maybe in the future we'll have two options.
+**Output to Chat** Will put the message (or something similar) seen in the status box in the debug
+chat channel. It's not ideal, but it will give some feedback when using silent mode.
+
+The options are saved account wide at 
+`%appdata%\NCSOFT\WildStar\AddonSaveData\<wildstar account>\Kael's Housing Tour_0_Acct.xml`.
 
 
 ### With other Addon's
