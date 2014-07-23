@@ -248,7 +248,7 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
         self.wndMain:FindChild("StatusMsg"):SetText("Welcome home.")
         
         -- Command line output.
-        if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. GameLib.GetPlayerUnit():GetName()) end
+        if(self.tOptions['bCmdLineOut']) then Print("Arriving at: your property.") end
 
         -- Tour message.
         if self.bTourOpt then
@@ -269,7 +269,7 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
                 self.wndMain:FindChild("StatusMsg"):SetText(tNeighbors[index].strCharacterName .. " is your neighbor!")
                 
                 -- Command line output.
-                if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. tNeighbors[index].strCharacterName) end
+                if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. tNeighbors[index].strCharacterName .. "'s property.") end
 
                 -- Tour message.
                 if self.bTourOpt then
@@ -282,6 +282,9 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
 
         -- If all else fails, start the public search.
         self.wndMain:FindChild("StatusMsg"):SetText("Searching for " .. strInputPlayer .. ".")
+        
+        -- Command line output.
+        if(self.tOptions['bCmdLineOut']) then Print("Searching for " .. strInputPlayer .. ".") end
 
         -- Setup global variables.
         self.tPublicList = {}
@@ -321,7 +324,7 @@ function HousingTour:PublicPropertySearch()
         end
         
         -- Player property found as public property, go there.
-        if string.lower(strPlayerFound) == self.strPlayerSearch  then
+        if string.lower(strPlayerFound) == self.strPlayerSearch then
             bFound = true
             self.bFind = false
             self.nTotalSearches = 0
@@ -329,9 +332,12 @@ function HousingTour:PublicPropertySearch()
             self.nRepeteNumber = 0
             HousingLib.RequestRandomVisit(tResidences[i].nId)
             Event_FireGenericEvent("HT-PropertySearchSuccess",
-                                   {strSentTo = strInputPlayer,
+                                   {strSentTo = strPlayerFound,
                                     strType = "public"})
             self.wndMain:FindChild("StatusMsg"):SetText("You have arrived at " .. strPlayerFound .. "'s house!")
+            
+            -- Command line output.
+            if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. strPlayerFound .. "'s property.") end
             
             -- Tour message.
             if self.bTourOpt then
@@ -351,10 +357,12 @@ function HousingTour:PublicPropertySearch()
         self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: " .. nUnique)
         self.nTotalSearches = self.nTotalSearches + 1
 
-        if self.nRepeteNumber > 5000 then
+        if self.nRepeteNumber > 1000 then
             Event_FireGenericEvent("HT-PropertySearchTimeout",
-                                   {strSearchFor = strInputPlayer})
-            self.wndMain:FindChild("StatusMsg"):SetText("Auto Stop: The last 5,000 searches found no more unique properties. You are probably not going to find it.")
+                                   {strSearchFor = self.strPlayerSearch})
+            self.wndMain:FindChild("StatusMsg"):SetText("Auto Stop: The last 1,000 searches found no more unique properties. You are probably not going to find it.")
+            if(self.tOptions['bCmdLineOut']) then Print("Gave up searching for " .. self.strPlayerSearch .. ".") end
+            
             self.bFind = false
         end
     end
@@ -405,11 +413,7 @@ end
 
 
 function HousingTour:OnSave(tSaveType)
-    
-    if tSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
-        Print(tSaveType)
-        Print(GameLib.CodeEnumAddonSaveLevel.Account)
-        
+    if tSaveType == GameLib.CodeEnumAddonSaveLevel.Account then        
         local tSave = self.tOptions
         return tSave
     else
@@ -419,7 +423,6 @@ end
 
 
 function HousingTour:OnRestore(tSaveType, tData)
-    Print("data loaded")
     self.tOptions = tData
 end
 
