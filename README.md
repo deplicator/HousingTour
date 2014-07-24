@@ -166,6 +166,7 @@ Initial release.
 * Visit properties from the command line without showing the addon by enabling **Silent Mode**.
 * Status message can be **Output to Chat**, in case silent mode is too quite.
 * Slight visual improvements.
+* Public list...
 
 
 
