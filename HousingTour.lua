@@ -317,6 +317,12 @@ function HousingTour:PublicPropertySearch()
 
         -- Add found player to a table.
         if self.tPublicList[strPlayerFound] == nil then
+            local publicfound = self.wndPublicList:FindChild("PublicFound")
+            local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
+            wndPublicListItem:SetText(strPlayerFound)
+            publicfound:ArrangeChildrenVert()
+
+            
             self.tPublicList[strPlayerFound] = 1
             self.nRepeteNumber = 0
         else

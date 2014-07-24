@@ -11,6 +11,14 @@ further warning.
 
 ![Screenshot](http://geekwagon.net/projects/HousingTour/khtss.png)
 
+
+License
+-------
+This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
+K.L. Phan, see LICENSE.txt included with this addon, or 
+[read this summary](https://www.tldrlegal.com/l/mit).
+
+
 Why
 ---
 It's called Kael's Housing Tour because Kaelish on Stormtalon rallied together a full raid of 
@@ -124,14 +132,6 @@ Here is a quick example function for both events:
     end
 
 
-
-License
--------
-This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
-K.L. Phan, see LICENSE.txt included with this addon, or 
-[read this summary](https://www.tldrlegal.com/l/mit).
-
-
 For the Future
 --------------
 There are more features than we can write down that we'd like to add to _Housing Tour_. Here is a
@@ -149,3 +149,26 @@ short list of what is in the near future.
 * More awesome public search.
 * Announce Be My Guest achievement to tour.
 * History of where the tour went, so people can go back and see the cool things again.
+
+
+Change Log
+----------
+### 2014-07-18
+Initial release.
+
+### 2014-07-19
+* Triggers are now available for other addon's to use.
+
+### 2014-07-??
+* Searching for public property will now auto stop after 1000 searches if no more unique properties
+  are found.
+* Added an options panel! With two whole options!
+* Visit properties from the command line without showing the addon by enabling **Silent Mode**.
+* Status message can be **Output to Chat**, in case silent mode is too quite.
+* Slight visual improvements.
+
+
+
+
+
+
