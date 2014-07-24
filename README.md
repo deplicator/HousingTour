@@ -110,23 +110,23 @@ Other addons can get use the following two triggers:
 
     Apollo.RegisterEventHandler("HT-PropertySearch", "yourFunction", self)
     
-A table will be passed to your function that is `{strSearchFor = "PlayerName"}`. I know it's kind of
+A table will be passed to your function that is `{sSearchFor = "PlayerName"}`. I know it's kind of
 pointless to be a table, but this gives options for future expansion with less breakage.
 
     Apollo.RegisterEventHandler("HT-PropertySearchSuccess", "yourFunction", self)
 
-This event also passes a table to your function. This one has two strings; `strSentTo` is the player
-name that was searched for. The other is `strType` and it will have "home", "neighbor", or "public"
+This event also passes a table to your function. This one has two strings; `sSentTo` is the player
+name that was searched for. The other is `sType` and it will have "home", "neighbor", or "public"
 depending on the method that got the player to the property.
 
 Here is a quick example function for both events:
 
     function yourFunction(tData)
-        if tData.strSearchFor ~= nil then
-            Print("searched for " .. tData.strSearchFor)
+        if tData.sSearchFor ~= nil then
+            Print("searched for " .. tData.sSearchFor)
         end
-        if tData.strSentTo ~=nil then
-            Print(tData.strSentTo .. " : " .. tData.strType)
+        if tData.sSentTo ~=nil then
+            Print(tData.sSentTo .. " : " .. tData.sType)
         end
         return
     end
@@ -157,12 +157,12 @@ Change Log
 Initial release.
 
 ### 2014-07-19
-* Triggers are now available for other addon's to use.
+* Triggers added for other addons.
 
 ### 2014-07-??
 * Searching for public property will now auto stop after 1000 searches if no more unique properties
   are found.
-* Added an options panel! With two whole options!
+* Added an options panel with two whole options!
 * Visit properties from the command line without showing the addon by enabling **Silent Mode**.
 * Status message can be **Output to Chat**, in case silent mode is too quite.
 * Slight visual improvements.
