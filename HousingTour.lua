@@ -76,7 +76,7 @@ function HousingTour:OnLoad()
                         wndNew:FindChild("BtnText"):SetText("Send Tour Here")
                     else
                         wndNew:SetData("BtnHousingTour")
-                        if self.contextMenu.sTarget == GameLib.GetPlayerUnit():GetName() then
+                        if self.contextMenu.strTarget == GameLib.GetPlayerUnit():GetName() then
                             wndNew:FindChild("BtnText"):SetText("Go Home")
                         else
                             wndNew:FindChild("BtnText"):SetText("Tour Home")
@@ -92,9 +92,9 @@ function HousingTour:OnLoad()
     local oldContextClick = self.contextMenu.ProcessContextClick
     self.contextMenu.ProcessContextClick = function(context, eButtonType)
         if eButtonType == "BtnHousingTour" then
-            self:OnHousingTourOn('ht', self.contextMenu.sTarget)
+            self:OnHousingTourOn('ht', self.contextMenu.strTarget)
         elseif eButtonType == "BtnGuideTour" then
-            self:OnHousingTourOn('htg', self.contextMenu.sTarget)
+            self:OnHousingTourOn('htg', self.contextMenu.strTarget)
         else
             oldContextClick(context, eButtonType)
         end
