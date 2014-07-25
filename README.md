@@ -6,15 +6,15 @@ Please send feedback to james@geekwagon.net.
 
 Description
 -----------
-Kael's Housing Tour permits users to visit public houses with a command line entry or through the 
+Kael's Housing Tour permits users to visit public houses with a slash command or through the 
 right-click of a player's name in chat or through their nameplate. It was designed for people to 
 select a 'tour guide' and visit houses as a group through an opt-in feature applicable only in 
 player housing. Setting a tour guide permits another user to direct your character (and an unlimited
 number of others) to zone from one house to another together. This is useful for the Be My Guest 
-achievement. A full description of features is listed below:
+achievement. A full description of features are listed below:
 
 
-![Screenshot](http://geekwagon.net/projects/HousingTour/khtss.png)
+![Screenshot](http://geekwagon.net/projects/HousingTour/khtss2.png)
 
 
 Why
@@ -45,8 +45,8 @@ Right click option to tour home works in chat or on a selected player. Clicking 
 give the option "Go Home" which is exactly what it sounds like.
 
 Slash command `/ht` brings up the main form (see below for full list of slash commands). In this 
-version there is no way to search for a player in the form (coming maybe). You can quickly search
-for a player by name by tying it after the slash command; `/ht <PlayerName>`. Player name is not
+version there is no way to search for a player in the form (comming later). You can quickly search
+for a player by name by typing it after the slash command; `/ht <PlayerName>`. Player name is not
 case sensitive.
 
 Most people don't like to type (this is a mystery to me), so check out the **Public List** button at
@@ -83,7 +83,7 @@ As a Tour Guide the right click menu option will change to "Send Tour Here". Thi
 everyone with you set as their tour guide, to that player's home provided it is public. Players not 
 in housing will not be ported.
 
-Tour Guides can also use the new **Public List** window. After you set yourself as a guide player 
+Tour Guides can also use the new **Public List** window. After you set yourself as a guide, player 
 names clicked on in **Public List** will take the tour there.
 
 ### Options Panel
