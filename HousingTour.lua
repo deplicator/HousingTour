@@ -103,7 +103,7 @@ function HousingTour:OnLoad()
     Apollo.RegisterEventHandler("HousingRandomResidenceListRecieved", "PublicPropertySearch", self)
 
     -- Change channel name for testing.
-    self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-debug", "OnIncomingMessage", self)
+    self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-live", "OnIncomingMessage", self)
 
 end
 

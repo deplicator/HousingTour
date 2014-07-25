@@ -1,8 +1,8 @@
 Kael's Housing Tour
 ===================
-_Making Public Houses MORE Public_
+_Making Public Houses Public_
 
-This is still a very early version, please let me know of bugs at james@geekwagon.net.
+Please send feedback to james@geekwagon.net.
 
 Description
 -----------
@@ -13,13 +13,6 @@ player housing. Setting a tour guide permits another user to direct your charact
 number of others) to zone from one house to another together. This is useful for the Be My Guest 
 achievement. A full description of features is listed below:
 
-
-**Important Notice**
-This mod will automatically port you to a public house _only if_ (1) the addon is installed and 
-enabled, _only if_ (2) you are in player housing, _only if_ (3) you are opted in (check box), and 
-_only if_ (4) you have typed in a Tour Guide's name. Once you meet those _four_ requirements a red
-message will display in the addon's window. At this point the Tour Guide can port you without 
-further warning.
 
 ![Screenshot](http://geekwagon.net/projects/HousingTour/khtss.png)
 
@@ -39,9 +32,6 @@ achievement, but it turned out to be a fun way to see what people did with their
 was created to make it easier for a Tour Guide to port their horde of followers to the same public
 property in a short amount of time.
 
-Also note the author of this addon has an affinity for the command line. As a side effect the slash 
-commands tend to be tested more throughly than the gui.
-
 
 Install
 -------
@@ -58,45 +48,52 @@ by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar
 How to Use
 ----------
 ### General Use
-After installing this addon, clicking on a selected player's nameplate or a player's name in chat 
-will give the option to "Tour Home". If you are in the player housing zone, this will immediately 
-take you to that player's house if they are your neighbor or it will start a search of public 
-housing for that player.
+Right click option to tour home works in chat or on a selected player. Clicking on yourself will 
+give the option "Go Home" which is exactly what it sounds like.
 
-Clicking on yourself will give the option "Go Home" which is exactly what it sounds like.
+Slash command `/ht` brings up the main form (see below for full list of slash commands). In this 
+version there is no way to search for a player in the form (coming maybe). You can quickly search
+for a player by name by tying it after the slash command; `/ht <PlayerName>`. Player name is not
+case sensitive.
 
-* `/HousingTour <PlayerName>` Take you to PlayerName's public property. Without a PlayerName the
-  addon window will open. PlayerName is not case sensitive.
-* `/ht <PlayerName>` Shorter version of previous command.
-* `/ht ~` Sends you home.
+Most people don't like to type (this is a mystery to me), so check out the **Public List** button at
+the bottom of the window. This will take a moment, but will give a list of all public properties 
+found in your faction on the server. Clicking on a player in **Public List** will take you to that
+property.
 
-It's a safe bet once the Unique Properties Searched number stops increasing, the house you are 
-looking for isn't public or doesn't exist. This is also a decent estimate of the number of public 
-properties available to your faction on your server. 
+As of writing this, a house set to public can take up to a week before it's recognized by the server
+as public.
 
-As of writing this, a house set to public can take up to a week before it's recognized by the 
-server as public.
- 
+### Joining a Tour
+**Important Notice**  
+This mod will automatically port you to a public house _only if_ (1) the addon is installed and 
+enabled, _only if_ (2) you are in player housing, _only if_ (3) you are opted in (check box), and 
+_only if_ (4) you have typed in a Tour Guide's name. Once you meet those _four_ requirements a red
+message will display in the addon's window. At this point the Tour Guide can port you without 
+further warning.
+
 In case it's not intuitive; to join a tour click the "Join a Tour" check box (it's a round box).
 
-You can change the Tour Guide with the "Change Guide" button. You'll have to type the Tour Guide's 
-name (spelled correctly), but it's not case sensitive.
+By default there is no tour guide, you must set one with the "Change Guide" button. Type the Tour 
+Guide's name (spelled correctly) into the box. This is also not case sensitve.
 
+At this point, if you're in player housing, you've meet all the requirements in the **Important 
+Notice** above and can be automatically ported by the tour guide.
 
-### As a Guide
+### Leading a Tour
 **You join a tour and set yourself as the Tour Guide.**
 
-As a Tour Guide the right click menu option "Tour Home" will change to "Send Tour Here". This will 
-take you, and everyone with you set as their tour guide, to that player's home. Players not in 
-housing will not be ported.
+So, you suckered some people! I mean... got a group to tour houses (probably seeking the Be My Guest
+achievement).
 
-* `/HousingTourGuide <PlayerName>` Will take you and anyone else in the housing zone with you set 
-  as their Tour Guide to the named player's house if it's public.
-* `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
-* `/htg ~` Sends all players to their respective houses.
+As a Tour Guide the right click menu option will change to "Send Tour Here". This will take you, and
+everyone with you set as their tour guide, to that player's home provided it is public. Players not 
+in housing will not be ported.
 
+Tour Guides can also use the new **Public List** window. After you set yourself as a guide player 
+names clicked on in **Public List** will take the tour there.
 
-### Now with Options
+### Options Panel
 **Silent Mode** will keep the main form from popping up every time you attempt to go to a players 
 house from the command line (ie `/ht PlayerName`). The form still comes up when using `/ht` or 
 `/htg`. 
@@ -107,8 +104,21 @@ chat channel. It's not ideal, but it will give some feedback when using silent m
 The options are saved account wide at 
 `%appdata%\NCSOFT\WildStar\AddonSaveData\<wildstar account>\Kael's Housing Tour_0_Acct.xml`.
 
+### List of Slash Commands
+The following commands are available for anyone to use.
+* `/HousingTour` or `/ht` Opens main form.
+* `/HousingTour <PlayerName>` Port you to PlayerName's public property.
+* `/ht <PlayerName>` Shorter version of previous command.
+* `/ht ~` Takes you home.
 
-### With other Addon's
+These commands are only for the tour guide.
+* `/HousingTourGuide <PlayerName>` Will take the tour the named player's house if it's public.
+* `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
+* `/htg ~` Sends all players to their respective houses.
+
+
+Triggers for other Addons
+-------------------------
 Other addon's can make use of Kael's Housing Tour search feature. To go to another players property
 use:
 
@@ -134,11 +144,11 @@ depending on the method that got the player to the property.
 Here is a quick example function for both events:
 
     function yourFunction(tData)
-        if tData.sSearchFor ~= nil then
-            Print("searched for " .. tData.sSearchFor)
+        if tData.strSearchFor ~= nil then
+            Print("searched for " .. tData.strSearchFor)
         end
         if tData.sSentTo ~=nil then
-            Print(tData.sSentTo .. " : " .. tData.sType)
+            Print(tData.strSentTo .. " : " .. tData.strType)
         end
         return
     end
