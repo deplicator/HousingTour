@@ -125,13 +125,13 @@ Other addons can use the following two triggers:
 
     Apollo.RegisterEventHandler("HT-PropertySearch", "yourFunction", self)
     
-A table will be passed to your function that is `{sSearchFor = "PlayerName"}`. I know it's kind of
+A table will be passed to your function that is `{strSearchFor = "PlayerName"}`. I know it's kind of
 pointless to be a table, but this gives options for future expansion with less breakage.
 
     Apollo.RegisterEventHandler("HT-PropertySearchSuccess", "yourFunction", self)
 
-This event also passes a table to your function. This one has two strings; `sSentTo` is the player
-name that was searched for. The other is `sType` and it will have "home", "neighbor", or "public"
+This event also passes a table to your function. This one has two strings; `strSentTo` is the player
+name that was searched for. The other is `strType` and it will have "home", "neighbor", or "public"
 depending on the method that got the player to the property.
 
 Here is a quick example function for both events:
