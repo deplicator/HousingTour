@@ -176,22 +176,21 @@ short list of what is in the near future.
 
 Change Log
 ----------
-### 2014-07-18
-Initial release.
+* 2014-07-18  
+    * Initial release.
 
-### 2014-07-19
-Triggers added.
+* 2014-07-19  
+    * Triggers added.
 
-### 2014-07-25 
-#### v2 Free hugs with every purchase.
-* Slight visual improvements.
-* Searching for public property will now auto stop after 1000 searches if no more unique properties
-  are found.
-* Added an options panel with two whole options!
-* Option: **Silent Mode** allows you to visit properties from the command line without the main form
-  poping up all the time.
-* Option: **Output to Chat**, in case silent mode is too quiet.
-* Public list... just go play with it. It's awesome.
+* 2014-07-25 v2 Free hugs with every purchase.
+    * Slight visual improvements.
+    * Searching for public property will now auto stop after 1000 searches if no more unique 
+      properties are found.
+    * Added an options panel with two whole options!
+    * Option: **Silent Mode** allows you to visit properties from the command line without the main 
+      form popping up all the time.
+    * Option: **Output to Chat**, in case silent mode is too quiet.
+    * Public list... just go play with it. It's awesome.
 
 
 
