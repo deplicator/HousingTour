@@ -29,7 +29,7 @@ property in a short amount of time.
 Install
 -------
 This addon can also be downloaded from 
-[Curse](http://www.curse.com/ws-addons/wildstar/222538-kaels-housing-tour).
+[Curse](http://www.curse.com/ws-addons/wildstar/222538-kaels-housing-tour) or [GitHub]().
 
 If downloading from GitHub be sure to download the master branch. You may need to rename the 
 extracted folder from `HousingTour-master` to `HousingTour`.
@@ -182,7 +182,7 @@ Initial release.
 ### 2014-07-19
 * Triggers added.
 
-### 2014-07-25
+### 2014-07-25 v2 Free hugs with every purchase.
 * Slight visual improvements.
 * Searching for public property will now auto stop after 1000 searches if no more unique properties
   are found.
