@@ -41,16 +41,15 @@ by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar
 How to Use
 ----------
 ### General Use
-Right click option to tour home works in chat or on a selected player. Clicking on yourself will 
-give the option "Go Home" which is exactly what it sounds like.
+Right click option to **Tour Home** works in chat or on a selected player. Clicking on yourself will 
+give the option **Go Home** which is what it sounds like.
 
-Slash command `/ht` brings up the main form (see below for full list of slash commands). In this 
-version there is no way to search for a player in the form (comming later). You can quickly search
-for a player by name by typing it after the slash command; `/ht <PlayerName>`. Player name is not
-case sensitive.
+Slash command `/ht` brings up the main form (see below for full list of slash commands). There is no
+way to search for a player in the form (comming later). You can quickly search for a player name by 
+typing; `/ht <PlayerName>`. Player name is not case sensitive.
 
 Most people don't like to type (this is a mystery to me), so check out the **Public List** button at
-the bottom of the window. This will take a moment, but will give a list of all public properties 
+the bottom of the main form. This will take a moment, but gives a list of all public properties 
 (except yourself) found in your faction on the server. Clicking on a player in **Public List** will 
 take you to that property. 
 
