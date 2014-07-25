@@ -29,14 +29,14 @@ function HousingTour:new(o)
 
     -- initialize variables here
     self.wndMain = nil          -- Main form.
-    self.sPlayerSearch = ""   -- Player name searched in lower case used for searching.
+    self.strPlayerSearch = ""   -- Player name searched in lower case used for searching.
     self.bFind = false          -- Boolean to halt searching.
     self.tPublicList = {}       -- Table of unique player names with housing set to public.
     self.nTotalSearches = 0     -- Number of searches done.
     self.nRepeteNumber = 0      -- Number of searches done when nothing unique added to tPublicList.
 
     self.bTourOpt = false       -- Boolean to option into tour, must be true for auto-porting.
-    self.sGuide = ""          -- Tour guide name, must have contents for auto-porting.
+    self.strGuide = ""          -- Tour guide name, must have contents for auto-porting.
 
     self.tOptions = {}          -- Table for saved options.
     return o
@@ -44,11 +44,11 @@ end
 
 function HousingTour:Init()
 	local bHasConfigureFunction = false
-	local sConfigureButtonText = ""
+	local strConfigureButtonText = ""
 	local tDependencies = {
 		-- "UnitOrPackageName",
 	}
-    Apollo.RegisterAddon(self, bHasConfigureFunction, sConfigureButtonText, tDependencies)
+    Apollo.RegisterAddon(self, bHasConfigureFunction, strConfigureButtonText, tDependencies)
 end
 
 
@@ -71,7 +71,7 @@ function HousingTour:OnLoad()
 
                 if not wndNew then
                     wndNew = Apollo.LoadForm(self.contextMenu.xmlDoc, "BtnRegular", wndButtonList, self.contextMenu)
-                    if string.lower(self.sGuide) == string.lower(GameLib.GetPlayerUnit():GetName()) then
+                    if string.lower(self.strGuide) == string.lower(GameLib.GetPlayerUnit():GetName()) then
                         wndNew:SetData("BtnGuideTour")
                         wndNew:FindChild("BtnText"):SetText("Send Tour Here")
                     else
@@ -157,9 +157,9 @@ end
 -----------------------------------------------------------------------------------------------
 
 -- When slash command are used.
--- @param sCommand        Slash command used to call.
--- @param sInputPlayer    The player name to search for.
-function HousingTour:OnHousingTourOn(sCommand, sInputPlayer)
+-- @param strCommand        Slash command used to call.
+-- @param strInputPlayer    The player name to search for.
+function HousingTour:OnHousingTourOn(strCommand, strInputPlayer)
 
     -- Show main form.
     self.wndMain:Invoke()
@@ -174,32 +174,32 @@ function HousingTour:OnHousingTourOn(sCommand, sInputPlayer)
     end
 
     -- When single player commands are used, start search.
-    if string.lower(sCommand) == "housingtour" or string.lower(sCommand) == "ht" then
-        self:PropertySearch(sInputPlayer, self.tOptions['bSilentMode'])
+    if string.lower(strCommand) == "housingtour" or string.lower(strCommand) == "ht" then
+        self:PropertySearch(strInputPlayer, self.tOptions['bSilentMode'])
 
     -- When tour guide commands are used.
-    elseif string.lower(sCommand) == "housingtourguide" or string.lower(sCommand) == "htg" then
+    elseif string.lower(strCommand) == "housingtourguide" or string.lower(strCommand) == "htg" then
 
         -- Initial messages.
         self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: 0")
 
         -- Player is not a tour guide.
-        if string.lower(GameLib.GetPlayerUnit():GetName()) ~= string.lower(self.sGuide) then
+        if string.lower(GameLib.GetPlayerUnit():GetName()) ~= string.lower(self.strGuide) then
             self.wndMain:FindChild("StatusMsg"):SetText("Type /ht PlayerName to search for and visit a public property.")
             self.wndMain:FindChild("TourMsg"):SetText("You are not a tour guide.")
             return
 
         -- Check for player search string
-        elseif sInputPlayer == nil or sInputPlayer == "" then
+        elseif strInputPlayer == nil or strInputPlayer == "" then
             self.wndMain:FindChild("StatusMsg"):SetText("Type /htg PlayerName to search for and visit a public property.")
             return
 
         -- Send message to the masses to begin search!
         else
-            self.wndMain:FindChild("StatusMsg"):SetText("Sending tour to " .. sInputPlayer .. ".")
+            self.wndMain:FindChild("StatusMsg"):SetText("Sending tour to " .. strInputPlayer .. ".")
             local tToSend = {}
-            tToSend["sGuide"] = self.sGuide
-            tToSend["sSearch"] = sInputPlayer
+            tToSend["strGuide"] = self.strGuide
+            tToSend["strSearch"] = strInputPlayer
             self.htChannel:SendMessage(tToSend)     -- send message data to others
             self:OnIncomingMessage(nil, tToSend)    -- send message data to self
             return
@@ -209,9 +209,9 @@ end
 
 
 -- Search for player in non-public places first. This is also where outside should hook in.
--- @param sInputPlayer    The player name to search for.
+-- @param strInputPlayer    The player name to search for.
 -- @param [bSilent]         If set to true main form will not pop up.
-function HousingTour:PropertySearch(sInputPlayer, bSilent)
+function HousingTour:PropertySearch(strInputPlayer, bSilent)
 
     -- Set optional bSilent parameter if not present.
     if bSilent == nil then
@@ -223,8 +223,8 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
     self.wndMain:FindChild("TourMsg"):SetText("")
     
     -- Get strait to making public list.
-    if sInputPlayer == "*" then
-        self.sPlayerSearch = "*"
+    if strInputPlayer == "*" then
+        self.strPlayerSearch = "*"
         self.tPublicList = {}
         self.nTotalSearches = 0
         self.bFind = true
@@ -237,7 +237,7 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
     self.wndMain:Show(not bSilent or self.bTourOpt)
 
     -- Check for player search string.
-    if sInputPlayer == nil or sInputPlayer == "" then
+    if strInputPlayer == nil or strInputPlayer == "" then
         self.wndMain:Show(true) -- If no search string is passed always show main form.
         if self.wndMain:FindChild("StatusMsg"):GetText() == "" then
             self.wndMain:FindChild("StatusMsg"):SetText("Type /ht PlayerName to search for and visit a player's property.")
@@ -246,18 +246,18 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
     end
 
     -- Custom event trigger for beginning of search.
-    Event_FireGenericEvent("HT-PropertySearch", {sSearchFor = sInputPlayer})
+    Event_FireGenericEvent("HT-PropertySearch", {strSearchFor = strInputPlayer})
 
     -- Set normalized search string.
-    self.sPlayerSearch = string.lower(sInputPlayer)
+    self.strPlayerSearch = string.lower(strInputPlayer)
 
     -- Handle searching for yourself.
-    if self.sPlayerSearch == string.lower(GameLib.GetPlayerUnit():GetName())
-    or self.sPlayerSearch == "~" then
+    if self.strPlayerSearch == string.lower(GameLib.GetPlayerUnit():GetName())
+    or self.strPlayerSearch == "~" then
         HousingLib.RequestTakeMeHome()
         Event_FireGenericEvent("HT-PropertySearchSuccess",
-                               {sSentTo = GameLib.GetPlayerUnit():GetName(),
-                                sType = "home"})
+                               {strSentTo = GameLib.GetPlayerUnit():GetName(),
+                                strType = "home"})
         self.wndMain:FindChild("StatusMsg"):SetText("Welcome home.")
 
         -- Command line output.
@@ -265,7 +265,7 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
 
         -- Tour message.
         if self.bTourOpt then
-            self.wndMain:FindChild("TourMsg"):SetText(self.sGuide .. " has sent the tour to your place!")
+            self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your place!")
         end
 
         return
@@ -274,11 +274,11 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
     else
         local tNeighbors = HousingLib.GetNeighborList()
         for index = 1, #tNeighbors do
-            if string.lower(tNeighbors[index].strCharacterName) == self.sPlayerSearch then
+            if string.lower(tNeighbors[index].strCharacterName) == self.strPlayerSearch then
                 HousingLib.VisitNeighborResidence(tNeighbors[index].nId)
                 Event_FireGenericEvent("HT-PropertySearchSuccess",
-                                       {sSentTo = sInputPlayer,
-                                        sType = "neighbor"})
+                                       {strSentTo = strInputPlayer,
+                                        strType = "neighbor"})
                 self.wndMain:FindChild("StatusMsg"):SetText(tNeighbors[index].strCharacterName .. " is your neighbor!")
 
                 -- Command line output.
@@ -286,7 +286,7 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
 
                 -- Tour message.
                 if self.bTourOpt then
-                    self.wndMain:FindChild("TourMsg"):SetText(self.sGuide .. " has sent the tour to your neighbor " .. tNeighbors[index].strCharacterName .. ".")
+                    self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your neighbor " .. tNeighbors[index].strCharacterName .. ".")
                 end
 
                 return
@@ -294,10 +294,10 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
         end
 
         -- If all else fails, start the public search.
-        self.wndMain:FindChild("StatusMsg"):SetText("Searching for " .. sInputPlayer .. ".")
+        self.wndMain:FindChild("StatusMsg"):SetText("Searching for " .. strInputPlayer .. ".")
 
         -- Command line output.
-        if(self.tOptions['bCmdLineOut']) then Print("Searching for " .. sInputPlayer .. ".") end
+        if(self.tOptions['bCmdLineOut']) then Print("Searching for " .. strInputPlayer .. ".") end
 
         -- Setup global variables.
         self.tPublicList = {}
@@ -346,19 +346,19 @@ function HousingTour:PublicPropertySearch()
     -- GetRandomResidenceList always returns 25 random residences (as far as I can tell).
 	local tResidences = HousingLib.GetRandomResidenceList()
     for i = 1, 25 do
-        local sPlayerFound = tResidences[i].strCharacterName
+        local strPlayerFound = tResidences[i].strCharacterName
         local nIdFound = tResidences[i].nId
 
         -- Add found player Public List table and window.
-        if self.tPublicList[sPlayerFound] == nil then
-            self.tPublicList[sPlayerFound] = 1
+        if self.tPublicList[strPlayerFound] == nil then
+            self.tPublicList[strPlayerFound] = 1
             self.nRepeteNumber = 0
         else
             self.nRepeteNumber = self.nRepeteNumber + 1
         end
 
         -- Player property found as public property, go there.
-        if string.lower(sPlayerFound) == self.sPlayerSearch then
+        if string.lower(strPlayerFound) == self.strPlayerSearch then
             bFound = true
             self.bFind = false
             self.nTotalSearches = 0
@@ -366,16 +366,16 @@ function HousingTour:PublicPropertySearch()
             self.nRepeteNumber = 0
             HousingLib.RequestRandomVisit(tResidences[i].nId)
             Event_FireGenericEvent("HT-PropertySearchSuccess",
-                                   {sSentTo = sPlayerFound,
-                                    sType = "public"})
-            self.wndMain:FindChild("StatusMsg"):SetText("You have arrived at " .. sPlayerFound .. "'s house!")
+                                   {strSentTo = strPlayerFound,
+                                    strType = "public"})
+            self.wndMain:FindChild("StatusMsg"):SetText("You have arrived at " .. strPlayerFound .. "'s house!")
 
             -- Command line output.
-            if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. sPlayerFound .. "'s property.") end
+            if(self.tOptions['bCmdLineOut']) then Print("Arriving at: " .. strPlayerFound .. "'s property.") end
 
             -- Tour message.
             if self.bTourOpt then
-                self.wndMain:FindChild("TourMsg"):SetText(self.sGuide .. " has sent the tour to " .. sPlayerFound .. "'s property.")
+                self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to " .. strPlayerFound .. "'s property.")
             end
             return
         end
@@ -393,10 +393,10 @@ function HousingTour:PublicPropertySearch()
 
         if self.nRepeteNumber > 1000 then
             Event_FireGenericEvent("HT-PropertySearchTimeout",
-                                   {sSearchFor = self.sPlayerSearch})
-            if self.sPlayerSearch ~= "*" then
-                self.wndMain:FindChild("StatusMsg"):SetText("Stopped search for " .. self.sPlayerSearch .. ". The last 1,000 searches found no more unique properties. The player doesn't exist or is not set to public.")
-                if(self.tOptions['bCmdLineOut']) then Print("Gave up searching for " .. self.sPlayerSearch .. ".") end
+                                   {strSearchFor = self.strPlayerSearch})
+            if self.strPlayerSearch ~= "*" then
+                self.wndMain:FindChild("StatusMsg"):SetText("Stopped search for " .. self.strPlayerSearch .. ". The last 1,000 searches found no more unique properties. The player doesn't exist or is not set to public.")
+                if(self.tOptions['bCmdLineOut']) then Print("Gave up searching for " .. self.strPlayerSearch .. ".") end
             else
                 self.wndMain:FindChild("StatusMsg"):SetText("Public list is done.")
             end
@@ -422,7 +422,7 @@ function HousingTour:AutoPortCheck()
         return false
 
     -- Guide named must not be blank.
-    elseif self.sGuide == "" or self.sGuide == nil then
+    elseif self.strGuide == "" or self.strGuide == nil then
         return false
 
     -- If three conditions are met, return true.
@@ -440,10 +440,10 @@ function HousingTour:OnIncomingMessage(channel, tMsg)
     if self:AutoPortCheck() then
 
         -- Tour guide set must match guide in message.
-        if string.lower(tMsg.sGuide) == string.lower(self.sGuide) then
+        if string.lower(tMsg.strGuide) == string.lower(self.strGuide) then
             self.wndMain:Invoke()
-            self.wndMain:FindChild("TourMsg"):SetText(tMsg.sGuide .. " is attempting to send you to " .. tMsg.sSearch .. "'s property.")
-            self:PropertySearch(tMsg.sSearch, false)
+            self.wndMain:FindChild("TourMsg"):SetText(tMsg.strGuide .. " is attempting to send you to " .. tMsg.strSearch .. "'s property.")
+            self:PropertySearch(tMsg.strSearch, false)
             return
         end
     end
@@ -495,19 +495,19 @@ end
 
 -- When "Join a Tour" is checked.
 function HousingTour:OnTourOptIn()
-    self.wndMain:FindChild("GuideTextBox"):SetText(self.sGuide)
+    self.wndMain:FindChild("GuideTextBox"):SetText(self.strGuide)
     self.wndMain:FindChild("ChangeGuideBtnBlock"):Show(false)
     self.bTourOpt = true
-    if self.sGuide == "" then
+    if self.strGuide == "" then
         self.wndMain:FindChild("TourMsg"):SetText("You must choose a tour guide.")
     else
-        self.wndMain:FindChild("TourMsg"):SetText("You will be ported to public housing with " .. self.sGuide .. ".")
+        self.wndMain:FindChild("TourMsg"):SetText("You will be ported to public housing with " .. self.strGuide .. ".")
     end
 end
 
 -- When "Join a Tour" is unchecked.
 function HousingTour:OnTourOptOut()
-    self.sGuide = ""
+    self.strGuide = ""
     self.wndMain:FindChild("GuideTextBox"):SetText("")
     self.wndMain:FindChild("ChangeGuideBtnBlock"):Show(true)
     self.bTourOpt = false
@@ -518,19 +518,19 @@ end
 function HousingTour:OnChangeGuide()
     self.wndMain:FindChild("ChangeGuideForm"):Show(true)
 
-    if self.sGuide == "" then
+    if self.strGuide == "" then
         self.wndMain:FindChild("ChangeGuideBox"):SetText("Kaelish")
     else
-        self.wndMain:FindChild("ChangeGuideBox"):SetText(self.sGuide)
+        self.wndMain:FindChild("ChangeGuideBox"):SetText(self.strGuide)
     end
 end
 
 -- When the "Change Guide Submit" button is clicked.
 function HousingTour:OnGuideChangeSubmit()
-    self.sGuide = self.wndMain:FindChild("ChangeGuideBox"):GetText()
-    self.wndMain:FindChild("GuideTextBox"):SetText(self.sGuide)
+    self.strGuide = self.wndMain:FindChild("ChangeGuideBox"):GetText()
+    self.wndMain:FindChild("GuideTextBox"):SetText(self.strGuide)
     self.wndMain:FindChild("ChangeGuideForm"):Show(false)
-    self.wndMain:FindChild("TourMsg"):SetText("You will be ported to public housing with " .. self.sGuide .. ".")
+    self.wndMain:FindChild("TourMsg"):SetText("You will be ported to public housing with " .. self.strGuide .. ".")
 end
 
 -- When the "Change Guide Close" button is clicked.
@@ -576,13 +576,13 @@ end
 -- Clicking on a name in the public list
 function HousingTour:OnPublicListButton(wndHandler, wndControl, eMouseButton, nLastRelativeMouseX, nLastRelativeMouseY, bDoubleClick, bStopPropagation)
 	-- You are not the tour guide
-    if string.lower(self.sGuide) ~= string.lower(GameLib.GetPlayerUnit():GetName()) then
+    if string.lower(self.strGuide) ~= string.lower(GameLib.GetPlayerUnit():GetName()) then
         self:PropertySearch(wndHandler:GetText(), self.tOptions['bSilentMode'])
     else
         self.wndMain:FindChild("StatusMsg"):SetText("Sending tour to " .. wndHandler:GetText() .. ".")
         local tToSend = {}
-        tToSend["sGuide"] = self.sGuide
-        tToSend["sSearch"] = wndHandler:GetText()
+        tToSend["strGuide"] = self.strGuide
+        tToSend["strSearch"] = wndHandler:GetText()
         self.htChannel:SendMessage(tToSend)     -- send message data to others
         self:OnIncomingMessage(nil, tToSend)    -- send message data to self
         return
