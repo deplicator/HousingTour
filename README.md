@@ -17,13 +17,6 @@ achievement. A full description of features is listed below:
 ![Screenshot](http://geekwagon.net/projects/HousingTour/khtss.png)
 
 
-License
--------
-This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
-K.L. Phan, see LICENSE.txt included with this addon, or 
-[read this summary](https://www.tldrlegal.com/l/mit).
-
-
 Why
 ---
 It's called Kael's Housing Tour because Kaelish on Stormtalon rallied together a full raid of 
@@ -41,7 +34,7 @@ If downloading from GitHub be sure to download the master branch. You may need t
 extracted folder from `HousingTour-master` to `HousingTour`.
 
 After downloading, extract to the WildStar Addon directory. Usually found at 
-`C:\Users\<your windows user name>\AppData\Roaming\NCSOFT\WildStar\Addons`. You can also get to it 
+`C:\Users\<windows user name>\AppData\Roaming\NCSOFT\WildStar\Addons`. You can also get to it 
 by typing `%appdata%\NCSOFT\WildStar\Addons` into a Windows Explorer address bar or search bar.
 
 
@@ -58,8 +51,8 @@ case sensitive.
 
 Most people don't like to type (this is a mystery to me), so check out the **Public List** button at
 the bottom of the window. This will take a moment, but will give a list of all public properties 
-found in your faction on the server. Clicking on a player in **Public List** will take you to that
-property.
+(except yourself) found in your faction on the server. Clicking on a player in **Public List** will 
+take you to that property. 
 
 As of writing this, a house set to public can take up to a week before it's recognized by the server
 as public.
@@ -154,6 +147,13 @@ Here is a quick example function for both events:
     end
 
 
+License
+-------
+This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
+K.L. Phan, see LICENSE.txt included with this addon, or 
+[read this summary](https://www.tldrlegal.com/l/mit).
+
+
 For the Future
 --------------
 There are more features than we can write down that we'd like to add to _Housing Tour_. Here is a
@@ -162,7 +162,8 @@ short list of what is in the near future.
 * ~~A context (right click) menu.~~
 * ~~Event triggers to support other addons.~~
 * ~~Auto stop searching after set number of non-unique property searches.~~
-* ~~Keep the gui from popping up _all_ the time~~
+* ~~Keep the gui from popping up _all_ the time.~~
+* ~~List of all public properties.~~
 
 * Visual searching indicator.
 * Speed dial, for example: `/ht 1` will take you to the player you've set as number 1.
@@ -179,16 +180,17 @@ Change Log
 Initial release.
 
 ### 2014-07-19
-* Triggers added for other addons.
+* Triggers added.
 
-### 2014-07-??
+### 2014-07-25
+* Slight visual improvements.
 * Searching for public property will now auto stop after 1000 searches if no more unique properties
   are found.
 * Added an options panel with two whole options!
-* Visit properties from the command line without showing the addon by enabling **Silent Mode**.
-* Status message can be **Output to Chat**, in case silent mode is too quite.
-* Slight visual improvements.
-* Public list...
+* Option: **Silent Mode** allows you to visit properties from the command line without the main form
+  poping up all the time.
+* Option: **Output to Chat**, in case silent mode is too quiet.
+* Public list... just go play with it. It's awesome.
 
 
 
