@@ -103,7 +103,7 @@ function HousingTour:OnLoad()
     Apollo.RegisterEventHandler("HousingRandomResidenceListRecieved", "PublicPropertySearch", self)
 
     -- Change channel name for testing.
-    self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-live", "OnIncomingMessage", self)
+    self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-debug", "OnIncomingMessage", self)
 
 end
 
@@ -196,12 +196,12 @@ function HousingTour:OnHousingTourOn(sCommand, sInputPlayer)
 
         -- Send message to the masses to begin search!
         else
-            self.wndMain:FindChild("StatusMsg"):SetText("Sending horde to " .. sInputPlayer .. ".")
+            self.wndMain:FindChild("StatusMsg"):SetText("Sending tour to " .. sInputPlayer .. ".")
             local tToSend = {}
             tToSend["sGuide"] = self.sGuide
             tToSend["sSearch"] = sInputPlayer
-            self:OnIncomingMessage(nil, tToSend)    -- send message data to self
             self.htChannel:SendMessage(tToSend)     -- send message data to others
+            self:OnIncomingMessage(nil, tToSend)    -- send message data to self
             return
         end
     end
@@ -286,7 +286,7 @@ function HousingTour:PropertySearch(sInputPlayer, bSilent)
 
                 -- Tour message.
                 if self.bTourOpt then
-                    self.wndMain:FindChild("TourMsg"):SetText(self.sGuide .. " has sent the tour to your neighbor " .. tNeighbors[index].sCharacterName .. ".")
+                    self.wndMain:FindChild("TourMsg"):SetText(self.sGuide .. " has sent the tour to your neighbor " .. tNeighbors[index].strCharacterName .. ".")
                 end
 
                 return
@@ -323,18 +323,19 @@ function HousingTour:PublicPropertySearch()
         publicfound:DestroyChildren()
         -- Temporary array used to sort self.tPublicList by key.
         local aTemp = {}
-
+        -- Populate temp array with correct order.
         for key in pairs(self.tPublicList) do
             table.insert(aTemp, key)
         end
         table.sort(aTemp)
 
-        -- Populate public list window.
+        -- Populate public list window from temp array.
         for index, name in ipairs(aTemp) do
             local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
             wndPublicListItem:FindChild("PublicListButton"):SetText(name)
         end
-
+        publicfound:SetText("")
+        
         publicfound:ArrangeChildrenVert()
         return
 	end
@@ -471,10 +472,8 @@ end
 function HousingTour:OnOK()
     self:OnSave(2)
 	self.wndMain:Close()
-    self.wndPublicList:Close()
     self.wndMain:FindChild("OptionsForm"):Show(false)
     self.wndMain:FindChild("OptionsCheckbox"):SetCheck(false)
-    self.bFind = false
 end
 
 -- When the Options box is checked.
@@ -576,43 +575,19 @@ end
 
 -- Clicking on a name in the public list
 function HousingTour:OnPublicListButton(wndHandler, wndControl, eMouseButton, nLastRelativeMouseX, nLastRelativeMouseY, bDoubleClick, bStopPropagation)
-	self:PropertySearch(wndHandler:GetText())
-end
-
-
-
-
-
---~ print a table
-function printTable(list, i)
-
-    local listString = ''
---~ begin of the list so write the {
-    if not i then
-        listString = listString .. '{'
-    end
-
-    i = i or 1
-    local element = list[i]
-
---~ it may be the end of the list
-    if not element then
-        return listString .. '}'
-    end
---~ if the element is a list too call it recursively
-    if(type(element) == 'table') then
-        listString = listString .. printTable(element)
+	-- You are not the tour guide
+    if string.lower(self.sGuide) ~= string.lower(GameLib.GetPlayerUnit():GetName()) then
+        self:PropertySearch(wndHandler:GetText(), self.tOptions['bSilentMode'])
     else
-        listString = listString .. element
+        self.wndMain:FindChild("StatusMsg"):SetText("Sending tour to " .. wndHandler:GetText() .. ".")
+        local tToSend = {}
+        tToSend["sGuide"] = self.sGuide
+        tToSend["sSearch"] = wndHandler:GetText()
+        self.htChannel:SendMessage(tToSend)     -- send message data to others
+        self:OnIncomingMessage(nil, tToSend)    -- send message data to self
+        return
     end
-
-    return listString .. ', ' .. printTable(list, i + 1)
-
 end
-
-
-
-
 
 -----------------------------------------------------------------------------------------------
 -- HousingTour Instance

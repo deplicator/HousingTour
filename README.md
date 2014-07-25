@@ -1,6 +1,18 @@
 Kael's Housing Tour
 ===================
+_Making Public Houses MORE Public_
+
 This is still a very early version, please let me know of bugs at james@geekwagon.net.
+
+Description
+-----------
+Kael's Housing Tour permits users to visit public houses with a command line entry or through the 
+right-click of a player's name in chat or through their nameplate. It was designed for people to 
+select a 'tour guide' and visit houses as a group through an opt-in feature applicable only in 
+player housing. Setting a tour guide permits another user to direct your character (and an unlimited
+number of others) to zone from one house to another together. This is useful for the Be My Guest 
+achievement. A full description of features is listed below:
+
 
 **Important Notice**
 This mod will automatically port you to a public house _only if_ (1) the addon is installed and 
