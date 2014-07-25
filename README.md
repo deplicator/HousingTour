@@ -110,7 +110,7 @@ These commands are only for the tour guide.
 * `/htg ~` Sends all players to their respective houses.
 
 
-Triggers for other Addons
+Triggers for Other Addons
 -------------------------
 Other addon's can make use of Kael's Housing Tour search feature. To go to another players property
 use:
@@ -121,7 +121,7 @@ use:
 The second parameter, [silent], is an optional boolean value. If set to true the Housing Tour GUI
 will not show up.
 
-Other addons can get use the following two triggers:
+Other addons can use the following two triggers:
 
     Apollo.RegisterEventHandler("HT-PropertySearch", "yourFunction", self)
     
@@ -150,7 +150,7 @@ Here is a quick example function for both events:
 License
 -------
 This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
-K.L. Phan, see LICENSE.txt included with this addon, or 
+K. L. Phan, see LICENSE.txt included with this addon, or 
 [read this summary](https://www.tldrlegal.com/l/mit).
 
 
