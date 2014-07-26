@@ -71,6 +71,7 @@ These commands are only for the tour guide.
 * `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
 * `/htg ~` Sends all players to their respective houses.
 
+
 License
 -------
 This addon is licensed under the MIT License (MIT) using Copyright (c) 2014 James Pryor and 
