@@ -6,6 +6,8 @@ List all public properties and makes it easier to visit them.
 
 Create a tour group that makes the Be My Guest achievement easier to obtain.
 
+Supported by [Neighbor Notes](http://www.curse.com/ws-addons/wildstar/221450-neighbor-notes).
+
 ![Screenshot](http://geekwagon.net/projects/HousingTour/khtss2.png)
 
 #### Download
