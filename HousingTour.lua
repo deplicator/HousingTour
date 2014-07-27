@@ -146,9 +146,14 @@ function HousingTour:OnDocLoaded()
 
         -- Set defaults and restore saved options.
         if self.tOptions.bSilentMode == nil then self.tOptions.bSilentMode = false end
-        if self.tOptions.bCmdLineOut == nil then self.tOptions.bCmdLineOut = false end
         self.wndMain:FindChild('SilentModeCheckbox'):SetCheck(self.tOptions['bSilentMode'])
+        
+        if self.tOptions.bCmdLineOut == nil then self.tOptions.bCmdLineOut = false end
         self.wndMain:FindChild('CmdLineOutCheckbox'):SetCheck(self.tOptions['bCmdLineOut'])
+        
+        if self.tOptions.nAutoStop == nil then self.tOptions.nAutoStop = 1000 end
+        self.wndMain:FindChild("SearchIntesityTextBox"):SetText(self.tOptions.nAutoStop)
+        self.wndMain:FindChild('AutoStopSliderBar'):SetValue(self.tOptions.nAutoStop)
  	end
 end
 
@@ -181,7 +186,7 @@ function HousingTour:OnHousingTourOn(strCommand, strInputPlayer)
     elseif string.lower(strCommand) == "housingtourguide" or string.lower(strCommand) == "htg" then
 
         -- Initial messages.
-        self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: 0")
+        self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Found: 0")
 
         -- Player is not a tour guide.
         if string.lower(GameLib.GetPlayerUnit():GetName()) ~= string.lower(self.strGuide) then
@@ -223,12 +228,14 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
     self.wndMain:FindChild("TourMsg"):SetText("")
     
     -- Get strait to making public list.
-    if strInputPlayer == "*" then
-        self.strPlayerSearch = "*"
+    if strInputPlayer == "pl" then
+        self.wndPublicList:Show(true)
+        self.strPlayerSearch = "pl"
         self.tPublicList = {}
         self.nTotalSearches = 0
         self.bFind = true
         HousingLib.RequestRandomResidenceList()
+        self.wndMain:Show(not bSilent or self.bTourOpt)
         self.wndMain:FindChild("StatusMsg"):SetText("Please wait a moment while public list is created.")
         return
     end
@@ -388,17 +395,18 @@ function HousingTour:PublicPropertySearch()
             nUnique = nUnique + 1
         end
 
-        self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Searched: " .. nUnique)
+        self.wndMain:FindChild("SearchedMsg"):SetText("Unique Properties Found: " .. nUnique)
         self.nTotalSearches = self.nTotalSearches + 1
 
-        if self.nRepeteNumber > 1000 then
+        if self.nRepeteNumber > self.tOptions.nAutoStop then
             Event_FireGenericEvent("HT-PropertySearchTimeout",
                                    {strSearchFor = self.strPlayerSearch})
-            if self.strPlayerSearch ~= "*" then
-                self.wndMain:FindChild("StatusMsg"):SetText("Stopped search for " .. self.strPlayerSearch .. ". The last 1,000 searches found no more unique properties. The player doesn't exist or is not set to public.")
+            if self.strPlayerSearch ~= "pl" then
+                self.wndMain:FindChild("StatusMsg"):SetText("Stopped search for " .. self.strPlayerSearch .. ". The last " .. self.tOptions.nAutoStop .. " searches found no more unique properties. The player doesn't exist or is not set to public.")
                 if(self.tOptions['bCmdLineOut']) then Print("Gave up searching for " .. self.strPlayerSearch .. ".") end
             else
                 self.wndMain:FindChild("StatusMsg"):SetText("Public list is done.")
+                self.wndPublicList:FindChild("PublicListWorking"):Show(false)
             end
 
             self.bFind = false
@@ -541,7 +549,7 @@ end
 -- When the "Public List" button is clicked.
 function HousingTour:OnPublicList()
     self.wndPublicList:Invoke()
-    self:PropertySearch("*")
+    self:PropertySearch("pl")
 end
 
 
@@ -563,6 +571,12 @@ end
 function HousingTour:OnCmdLineOutUncheck()
     self.tOptions['bCmdLineOut'] = false
 end
+
+function HousingTour:OnAutoStopSliderChanged(wndHandler, wndControl)
+    self.tOptions.nAutoStop = wndHandler:GetValue()
+    self.wndMain:FindChild("SearchIntesityTextBox"):SetText(wndHandler:GetValue())
+end
+
 
 
 -----------------------------------------------------------------------------------------------

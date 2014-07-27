@@ -65,6 +65,7 @@ The following commands are available for anyone to use.
 * `/HousingTour <PlayerName>` Port you to PlayerName's public property.
 * `/ht <PlayerName>` Shorter version of previous command.
 * `/ht ~` Takes you home.
+* `/ht pl` Opens Public List.
 
 These commands are only for the tour guide.
 * `/HousingTourGuide <PlayerName>` Will take the tour the named player's house if it's public.
@@ -98,3 +99,10 @@ Please send feedback to <mailto:james@geekwagon.net>.
   popping up all the time.
 * Option: **Output to Chat**, in case silent mode is too quiet.
 * Public list... just go play with it. It's awesome.
+
+#### 2014-??-?? | _v3 _
+* Option: **Search Intensity** is the number of searches for public properties done when no more
+  unique properties are found.
+* New slash command to go strait to Public List, `/ht pl`,
+* Added "working" indicator to Public List.
+  
