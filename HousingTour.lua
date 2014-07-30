@@ -480,22 +480,20 @@ function HousingTour:PopulateSatchel(bRescroll)
 	local nMinCount = 1
 
 	local strSearchString = self.wndPublicList:FindChild("SearchBox"):GetText()
-	--local bSearchString = string.len(strSearchString) > 0
-	--self.wndPublicList:FindChild("SearchClearBtn"):Show(bSearchString)
+	local bSearchString = string.len(strSearchString) > 0
+	self.wndPublicList:FindChild("SearchClearBtn"):Show(bSearchString)
 
-    
-    
-    
-    
         -- Public list window.
         local publicfound = self.wndPublicList:FindChild("PublicFound")
         -- Remove previous results.
         publicfound:DestroyChildren()
         -- Temporary array used to sort self.tPublicList by key.
         local aTemp = {}
-        -- Populate temp array with correct order.
+        -- Populate temp array with correct order and limited by search string.
         for key in pairs(self.tPublicList) do
-            if string.len(strSearchString) > 0 and self:HelperSearchNameMatch(key, strSearchString) then
+            if bSearchString and self:HelperSearchNameMatch(key, strSearchString) then
+                table.insert(aTemp, key)
+            elseif not bSearchString then
                 table.insert(aTemp, key)
             end
         end
