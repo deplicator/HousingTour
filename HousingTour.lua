@@ -457,6 +457,7 @@ function HousingTour:OnIncomingMessage(channel, tMsg)
     end
 end
 
+
 -- Save addon options, should always be called with 2.
 function HousingTour:OnSave(tSaveType)
     if tSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
@@ -467,10 +468,60 @@ function HousingTour:OnSave(tSaveType)
     end
 end
 
+
 -- Restore addon options.
 function HousingTour:OnRestore(tSaveType, tData)
     self.tOptions = tData
 end
+
+
+function HousingTour:PopulateSatchel(bRescroll)
+
+	local nMinCount = 1
+
+	local strSearchString = self.wndPublicList:FindChild("SearchBox"):GetText()
+	--local bSearchString = string.len(strSearchString) > 0
+	--self.wndPublicList:FindChild("SearchClearBtn"):Show(bSearchString)
+
+    
+    
+    
+    
+        -- Public list window.
+        local publicfound = self.wndPublicList:FindChild("PublicFound")
+        -- Remove previous results.
+        publicfound:DestroyChildren()
+        -- Temporary array used to sort self.tPublicList by key.
+        local aTemp = {}
+        -- Populate temp array with correct order.
+        for key in pairs(self.tPublicList) do
+            if string.len(strSearchString) > 0 and self:HelperSearchNameMatch(key, strSearchString) then
+                table.insert(aTemp, key)
+            end
+        end
+        table.sort(aTemp)
+
+        -- Populate public list window from temp array.
+        for index, name in ipairs(aTemp) do
+            local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
+            wndPublicListItem:FindChild("PublicListButton"):SetText(name)
+        end
+        publicfound:SetText("")
+        
+        publicfound:ArrangeChildrenVert()
+
+end
+
+function HousingTour:HelperSearchNameMatch(strBase, strInput)
+	-- Find the first character of a word or an exact match from the start
+	strBase = strBase:lower() -- Not case sensitive
+	strInput = strInput:lower()
+	return strBase:find(strInput, 1, true)
+end
+
+    
+    
+    
 
 
 -----------------------------------------------------------------------------------------------
@@ -602,6 +653,11 @@ function HousingTour:OnPublicListButton(wndHandler, wndControl, eMouseButton, nL
         return
     end
 end
+
+function HousingTour:OnSearchBoxChanged(wndHandler, wndControl)
+	self:PopulateSatchel(true)
+end
+
 
 -----------------------------------------------------------------------------------------------
 -- HousingTour Instance

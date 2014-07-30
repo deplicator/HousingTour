@@ -56,6 +56,9 @@ opens with `/ht`.
 
 **Output to Chat** puts the message seen in the main form in the debug chat channel.
 
+**Search Intensity** is the number of searches for public properties when no more unique properties 
+are found. Higher numbers means longer search.
+
 The options are saved account wide at 
 `%appdata%\NCSOFT\WildStar\AddonSaveData\<wildstar account>\Kael's Housing Tour_0_Acct.xml`.
 
@@ -100,7 +103,7 @@ Please send feedback to <mailto:james@geekwagon.net>.
 * Option: **Output to Chat**, in case silent mode is too quiet.
 * Public list... just go play with it. It's awesome.
 
-#### 2014-??-?? | _v3 _
+#### 2014-??-?? | _v3 Oh my, look at all this work we have left to do._
 * Option: **Search Intensity** is the number of searches for public properties done when no more
   unique properties are found.
 * New slash command to go strait to Public List, `/ht pl`,
