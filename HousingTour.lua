@@ -61,46 +61,10 @@ function HousingTour:OnLoad()
 	self.xmlDoc:RegisterCallback("OnDocLoaded", self)
     self.contextMenu = Apollo.GetAddon("ContextMenuPlayer")
 
-    -- Add an extra button to the player context menu
-    local oldRedrawAll = self.contextMenu.RedrawAll
-    self.contextMenu.RedrawAll = function(context)
-        if self.contextMenu.wndMain ~= nil then
-            local wndButtonList = self.contextMenu.wndMain:FindChild("ButtonList")
-            if wndButtonList ~= nil then
-                local wndNew = wndButtonList:FindChildByUserData("BtnHousingTour")
-
-                if not wndNew then
-                    wndNew = Apollo.LoadForm(self.contextMenu.xmlDoc, "BtnRegular", wndButtonList, self.contextMenu)
-                    if string.lower(self.strGuide) == string.lower(GameLib.GetPlayerUnit():GetName()) then
-                        wndNew:SetData("BtnGuideTour")
-                        wndNew:FindChild("BtnText"):SetText("Send Tour Here")
-                    else
-                        wndNew:SetData("BtnHousingTour")
-                        if self.contextMenu.strTarget == GameLib.GetPlayerUnit():GetName() then
-                            wndNew:FindChild("BtnText"):SetText("Go Home")
-                        else
-                            wndNew:FindChild("BtnText"):SetText("Tour Home")
-                        end
-                    end
-                end
-            end
-        end
-        oldRedrawAll(context)
-    end
-
-    -- catch the event fired when the player clicks the context menu
-    local oldContextClick = self.contextMenu.ProcessContextClick
-    self.contextMenu.ProcessContextClick = function(context, eButtonType)
-        if eButtonType == "BtnHousingTour" then
-            self:OnHousingTourOn('ht', self.contextMenu.strTarget)
-        elseif eButtonType == "BtnGuideTour" then
-            self:OnHousingTourOn('htg', self.contextMenu.strTarget)
-        else
-            oldContextClick(context, eButtonType)
-        end
-    end
+    self:ContextMenuCheck()
 
     Apollo.RegisterEventHandler("HousingRandomResidenceListRecieved", "PublicPropertySearch", self)
+    Apollo.RegisterEventHandler("TargetUnitChanged", "ContextMenuCheck", self)
 
     -- Change channel name for testing.
     self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-live", "OnIncomingMessage", self)
@@ -135,14 +99,16 @@ function HousingTour:OnDocLoaded()
 		-- self.xmlDoc = nil
 
 		-- Register handlers for events, slash commands and timer, etc.
-		Apollo.RegisterSlashCommand("HousingTour",      "OnHousingTourOn", self)
-		Apollo.RegisterSlashCommand("housingtour",      "OnHousingTourOn", self)
-        Apollo.RegisterSlashCommand("HT",               "OnHousingTourOn", self)
-        Apollo.RegisterSlashCommand("ht",               "OnHousingTourOn", self)
+		Apollo.RegisterSlashCommand("HousingTour", "OnHousingTourOn", self)
+		Apollo.RegisterSlashCommand("housingtour", "OnHousingTourOn", self)
+        Apollo.RegisterSlashCommand("HT", "OnHousingTourOn", self)
+        Apollo.RegisterSlashCommand("ht", "OnHousingTourOn", self)
         Apollo.RegisterSlashCommand("HousingTourGuide", "OnHousingTourOn", self)
         Apollo.RegisterSlashCommand("housingtourguide", "OnHousingTourOn", self)
-		Apollo.RegisterSlashCommand("HTG",              "OnHousingTourOn", self)
-		Apollo.RegisterSlashCommand("htg",              "OnHousingTourOn", self)
+		Apollo.RegisterSlashCommand("HTG", "OnHousingTourOn", self)
+		Apollo.RegisterSlashCommand("htg", "OnHousingTourOn", self)
+		Apollo.RegisterSlashCommand("Home", "OnHousingTourOn", self)
+		Apollo.RegisterSlashCommand("home", "OnHousingTourOn", self)
 
         -- Set defaults and restore saved options.
         if self.tOptions.bSilentMode == nil then self.tOptions.bSilentMode = false end
@@ -177,11 +143,17 @@ function HousingTour:OnHousingTourOn(strCommand, strInputPlayer)
         if(self.tOptions['bCmdLineOut']) then Print("You must be in player housing to use this addon.") end
         return
     end
+    
+    if string.lower(strCommand) == "home" then
+        self:PropertySearch("~", self.tOptions['bSilentMode'])
+        return
+    end
 
     -- When single player commands are used, start search.
     if string.lower(strCommand) == "housingtour" or string.lower(strCommand) == "ht" then
         self:PropertySearch(strInputPlayer, self.tOptions['bSilentMode'])
-
+        return
+        
     -- When tour guide commands are used.
     elseif string.lower(strCommand) == "housingtourguide" or string.lower(strCommand) == "htg" then
 
@@ -322,28 +294,26 @@ end
 -- called.
 function HousingTour:PublicPropertySearch()
 
+    local tNeighbors = HousingLib.GetNeighborList()
+
 	if not self.bFind then
-
-        -- Public list window.
-        local publicfound = self.wndPublicList:FindChild("PublicFound")
-        -- Remove previous results.
-        publicfound:DestroyChildren()
-        -- Temporary array used to sort self.tPublicList by key.
-        local aTemp = {}
-        -- Populate temp array with correct order.
-        for key in pairs(self.tPublicList) do
-            table.insert(aTemp, key)
+        -- and non-public neighbors to list
+        for index in pairs(tNeighbors) do
+            if self.tPublicList[tNeighbors[index].strCharacterName] == nil then
+                self.tPublicList[tNeighbors[index].strCharacterName] = {}
+                self.tPublicList[tNeighbors[index].strCharacterName].strResidenceName = ""
+                self.tPublicList[tNeighbors[index].strCharacterName].strRelation = "neighbor"
+                self.tPublicList[tNeighbors[index].strCharacterName].bPublic = false
+            end
         end
-        table.sort(aTemp)
-
-        -- Populate public list window from temp array.
-        for index, name in ipairs(aTemp) do
-            local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
-            wndPublicListItem:FindChild("PublicListButton"):SetText(name)
+        -- add yourself to the list
+        if self.tPublicList[GameLib.GetPlayerUnit():GetName()] == nil then
+            self.tPublicList[GameLib.GetPlayerUnit():GetName()] = {}
+            self.tPublicList[GameLib.GetPlayerUnit():GetName()].strResidenceName = ""
+            self.tPublicList[GameLib.GetPlayerUnit():GetName()].strRelation = "yourself"
+            self.tPublicList[GameLib.GetPlayerUnit():GetName()].bPublic = false
         end
-        publicfound:SetText("")
-        
-        publicfound:ArrangeChildrenVert()
+        self:PopulatePublicList()
         return
 	end
 
@@ -354,11 +324,21 @@ function HousingTour:PublicPropertySearch()
 	local tResidences = HousingLib.GetRandomResidenceList()
     for i = 1, 25 do
         local strPlayerFound = tResidences[i].strCharacterName
-        local nIdFound = tResidences[i].nId
 
-        -- Add found player Public List table and window.
+        -- Add found player to Public List table.
         if self.tPublicList[strPlayerFound] == nil then
-            self.tPublicList[strPlayerFound] = 1
+            self.tPublicList[strPlayerFound] = {}
+            self.tPublicList[strPlayerFound].strResidenceName = tResidences[i].strResidenceName
+            self.tPublicList[strPlayerFound].bPublic = true
+            self.tPublicList[strPlayerFound].strRelation = "none"
+            
+            -- If relation to neighbor if they are a neighbor.
+            for index = 1, #tNeighbors do
+                if tNeighbors[index].strCharacterName == strPlayerFound then
+                    self.tPublicList[strPlayerFound].strRelation = "neighbor"
+                end
+            end
+            
             self.nRepeteNumber = 0
         else
             self.nRepeteNumber = self.nRepeteNumber + 1
@@ -417,6 +397,60 @@ function HousingTour:PublicPropertySearch()
 end
 
 
+-- Update public list with initial results and search results.
+function HousingTour:PopulatePublicList(strSearchString)
+    
+    if strSearchString == nil then
+        strSearchString = ""
+    end
+    
+	local bSearchString = string.len(strSearchString) > 0
+	self.wndPublicList:FindChild("SearchClearBtn"):Show(bSearchString)
+
+    -- Public list window.
+    local publicfound = self.wndPublicList:FindChild("PublicFound")
+    
+    -- Remove previous results.
+    publicfound:DestroyChildren()
+    
+    -- Temporary array used to sort self.tPublicList by key.
+    self.arTemp = {}
+    
+    -- Populate temp array with correct order and limited by search string.
+    for key in pairs(self.tPublicList) do
+        if bSearchString and key:lower():find(strSearchString:lower(), 1, true) then
+            table.insert(self.arTemp, key)
+        elseif not bSearchString then
+            table.insert(self.arTemp, key)
+        end
+    end
+    
+    -- Sort list
+    table.sort(self.arTemp)
+    
+    -- Populate public list window from temp array.
+    for index, name in ipairs(self.arTemp) do
+        local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
+
+        wndPublicListItem:FindChild("PublicListButton"):SetText(name)
+        wndPublicListItem:FindChild("PublicListButton"):SetTooltip(self.tPublicList[name].strResidenceName)
+        if self.tPublicList[name].strRelation == "neighbor" then
+            wndPublicListItem:FindChild("StatusBox"):SetText("n")
+            wndPublicListItem:FindChild("StatusBox"):SetTooltip("This is your neighbor.")
+        elseif self.tPublicList[name].strRelation == "yourself" then
+            wndPublicListItem:FindChild("StatusBox"):SetText("y")
+            wndPublicListItem:FindChild("StatusBox"):SetTooltip("This is you.")
+        else
+            wndPublicListItem:FindChild("StatusBox"):SetText("p")
+            wndPublicListItem:FindChild("StatusBox"):SetTooltip("This property is public.")
+        end
+    end
+    
+    publicfound:SetText("")
+    publicfound:ArrangeChildrenVert()
+end
+
+
 -- Multi-check to be sure the user wants to be part of a housing tour and auto-ported around. Return
 -- false if any check is not met, and true if all are met.
 function HousingTour:AutoPortCheck()
@@ -458,6 +492,54 @@ function HousingTour:OnIncomingMessage(channel, tMsg)
 end
 
 
+-- Add an extra button to the player context menu
+function HousingTour:ContextMenuCheck()
+    local oldRedrawAll = self.contextMenu.RedrawAll
+    
+    self.contextMenu.RedrawAll = function(context)
+        -- Check if right clicking on player
+        if self.contextMenu.unitTarget == nil or self.contextMenu.unitTarget:IsACharacter() then
+            -- check if in housing 
+            if self.contextMenu.wndMain ~= nil and HousingLib.IsHousingWorld() then
+                local wndButtonList = self.contextMenu.wndMain:FindChild("ButtonList")
+                if wndButtonList ~= nil then
+                    local wndNew = wndButtonList:FindChildByUserData("BtnHousingTour")
+
+                    if not wndNew then
+                        wndNew = Apollo.LoadForm(self.contextMenu.xmlDoc, "BtnRegular", wndButtonList, self.contextMenu)
+                        if string.lower(self.strGuide) == string.lower(GameLib.GetPlayerUnit():GetName()) then
+                            wndNew:SetData("BtnGuideTour")
+                            wndNew:FindChild("BtnText"):SetText("Send Tour Here")
+                        else
+                            wndNew:SetData("BtnHousingTour")
+                            if self.contextMenu.strTarget == GameLib.GetPlayerUnit():GetName() then
+                                wndNew:FindChild("BtnText"):SetText("Go Home")
+                            else
+                                wndNew:FindChild("BtnText"):SetText("Tour Home")
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        oldRedrawAll(context)
+    end
+
+    -- catch the event fired when the player clicks the context menu
+    local oldContextClick = self.contextMenu.ProcessContextClick
+    self.contextMenu.ProcessContextClick = function(context, eButtonType)
+        if eButtonType == "BtnHousingTour" then
+            self:OnHousingTourOn('ht', self.contextMenu.strTarget)
+        elseif eButtonType == "BtnGuideTour" then
+            self:OnHousingTourOn('htg', self.contextMenu.strTarget)
+        else
+            oldContextClick(context, eButtonType)
+        end
+    end
+    
+end
+
+
 -- Save addon options, should always be called with 2.
 function HousingTour:OnSave(tSaveType)
     if tSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
@@ -473,53 +555,6 @@ end
 function HousingTour:OnRestore(tSaveType, tData)
     self.tOptions = tData
 end
-
-
-function HousingTour:PopulateSatchel(bRescroll)
-
-	local nMinCount = 1
-
-	local strSearchString = self.wndPublicList:FindChild("SearchBox"):GetText()
-	local bSearchString = string.len(strSearchString) > 0
-	self.wndPublicList:FindChild("SearchClearBtn"):Show(bSearchString)
-
-        -- Public list window.
-        local publicfound = self.wndPublicList:FindChild("PublicFound")
-        -- Remove previous results.
-        publicfound:DestroyChildren()
-        -- Temporary array used to sort self.tPublicList by key.
-        local aTemp = {}
-        -- Populate temp array with correct order and limited by search string.
-        for key in pairs(self.tPublicList) do
-            if bSearchString and self:HelperSearchNameMatch(key, strSearchString) then
-                table.insert(aTemp, key)
-            elseif not bSearchString then
-                table.insert(aTemp, key)
-            end
-        end
-        table.sort(aTemp)
-
-        -- Populate public list window from temp array.
-        for index, name in ipairs(aTemp) do
-            local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
-            wndPublicListItem:FindChild("PublicListButton"):SetText(name)
-        end
-        publicfound:SetText("")
-        
-        publicfound:ArrangeChildrenVert()
-
-end
-
-function HousingTour:HelperSearchNameMatch(strBase, strInput)
-	-- Find the first character of a word or an exact match from the start
-	strBase = strBase:lower() -- Not case sensitive
-	strInput = strInput:lower()
-	return strBase:find(strInput, 1, true)
-end
-
-    
-    
-    
 
 
 -----------------------------------------------------------------------------------------------
@@ -637,7 +672,7 @@ function HousingTour:OnPublicListClose()
 end
 
 -- Clicking on a name in the public list
-function HousingTour:OnPublicListButton(wndHandler, wndControl, eMouseButton, nLastRelativeMouseX, nLastRelativeMouseY, bDoubleClick, bStopPropagation)
+function HousingTour:OnPublicListButton(wndHandler, wndControl)
 	-- You are not the tour guide
     if string.lower(self.strGuide) ~= string.lower(GameLib.GetPlayerUnit():GetName()) then
         self:PropertySearch(wndHandler:GetText(), self.tOptions['bSilentMode'])
@@ -652,8 +687,14 @@ function HousingTour:OnPublicListButton(wndHandler, wndControl, eMouseButton, nL
     end
 end
 
+-- Typing in search box
 function HousingTour:OnSearchBoxChanged(wndHandler, wndControl)
-	self:PopulateSatchel(true)
+	self:PopulatePublicList(self.wndPublicList:FindChild("SearchBox"):GetText())
+end
+
+-- Clear search results
+function HousingTour:OnSearchClearBtn()
+    self:PopulatePublicList()
 end
 
 

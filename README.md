@@ -108,4 +108,14 @@ Please send feedback to <mailto:james@geekwagon.net>.
   unique properties are found.
 * New slash command to go strait to Public List, `/ht pl`,
 * Added "working" indicator to Public List.
+* Added `/home` as an alternative to `/ht ~`. In the future it will take you home even if not in
+  housing (by way of Recall - House), but it doesn't appear to possible with the current api.
+* Change right click menu so it only shows up while in a housing zone, and only on players.
+* Public List now shows any property you have access to (like non-public neighbors and yourself).
+* Public List is searchable!
+
+
+
+
+
   
