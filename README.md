@@ -104,7 +104,7 @@ Please send feedback to <mailto:james@geekwagon.net>.
 * Option: **Output to Chat**, in case silent mode is too quiet.
 * Public list... just go play with it. It's awesome.
 
-#### 2014-??-?? | _v3 Oh my, look at all this work we have left to do._
+#### 2014-08-06 | _v3 Oh my, look at all this work we have left to do._
 * Option: **Search Intensity** is the number of searches for public properties done when no more
   unique properties are found.
 * New slash command to go strait to Public List, `/ht pl`,
