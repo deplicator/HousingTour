@@ -57,7 +57,8 @@ opens with `/ht`.
 **Output to Chat** puts the message seen in the main form in the debug chat channel.
 
 **Search Intensity** is the number of searches for public properties when no more unique properties 
-are found. Higher numbers means longer search.
+are found. Higher numbers means longer search. The default of 1000 usually works just fine, but 
+crank it up if you think it's not finding someone.
 
 The options are saved account wide at 
 `%appdata%\NCSOFT\WildStar\AddonSaveData\<wildstar account>\Kael's Housing Tour_0_Acct.xml`.
