@@ -64,14 +64,16 @@ The options are saved account wide at
 `%appdata%\NCSOFT\WildStar\AddonSaveData\<wildstar account>\Kael's Housing Tour_0_Acct.xml`.
 
 #### List of Slash Commands
-The following commands are available for anyone to use.
+The following commands are available for anyone to use.  
+
 * `/HousingTour` or `/ht` Opens main form.
 * `/HousingTour <PlayerName>` Port you to PlayerName's public property.
 * `/ht <PlayerName>` Shorter version of previous command.
 * `/ht ~` Takes you home.
 * `/ht pl` Opens Public List.
 
-These commands are only for the tour guide.
+These commands are only for the tour guide.  
+
 * `/HousingTourGuide <PlayerName>` Will take the tour the named player's house if it's public.
 * `/htg <PlayerName>` Keyboard stroke saving alternative to previous command.
 * `/htg ~` Sends all players to their respective houses.
@@ -107,7 +109,7 @@ Please send feedback to <mailto:james@geekwagon.net>.
 #### 2014-08-06 | _v3 Oh my, look at all this work we have left to do._
 * Option: **Search Intensity** is the number of searches for public properties done when no more
   unique properties are found.
-* New slash command to go strait to Public List, `/ht pl`,
+* New slash command to go strait to Public List, `/ht pl`.
 * Added "working" indicator to Public List.
 * Added `/home` as an alternative to `/ht ~`. In the future it will take you home even if not in
   housing (by way of Recall - House), but it doesn't appear to possible with the current api.
