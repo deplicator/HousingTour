@@ -29,6 +29,8 @@ function HousingTour:new(o)
 
     -- initialize variables here
     self.wndMain = nil          -- Main form.
+    self.wndAvailableList = nil -- Available Properties form
+    
     self.strPlayerSearch = ""   -- Player name searched in lower case used for searching.
     self.bFind = false          -- Boolean to halt searching.
     self.tPublicList = {}       -- Table of unique player names with housing set to public.
@@ -38,6 +40,7 @@ function HousingTour:new(o)
     self.bTourOpt = false       -- Boolean to option into tour, must be true for auto-porting.
     self.strGuide = ""          -- Tour guide name, must have contents for auto-porting.
 
+    self.tHistory = {}          -- Table for where your characters have been.
     self.tOptions = {}          -- Table for saved options.
     return o
 end
@@ -65,6 +68,8 @@ function HousingTour:OnLoad()
 
     Apollo.RegisterEventHandler("HousingRandomResidenceListRecieved", "PublicPropertySearch", self)
     Apollo.RegisterEventHandler("TargetUnitChanged", "ContextMenuCheck", self)
+    Apollo.RegisterEventHandler("VarChange_ZoneName", "OnChangeZoneName", self)
+    Apollo.RegisterEventHandler("SubZoneChanged", "OnChangeZoneName", self)
 
     -- Change channel name for testing.
     self.htChannel = ICCommLib.JoinChannel("KaelsHousingTour-live", "OnIncomingMessage", self)
@@ -79,21 +84,21 @@ function HousingTour:OnDocLoaded()
 
 	if self.xmlDoc ~= nil and self.xmlDoc:IsLoaded() then
 	    self.wndMain = Apollo.LoadForm(self.xmlDoc, "HousingTourForm", nil, self)
-        self.wndPublicList = Apollo.LoadForm(self.xmlDoc, "PublicListForm", nil, self)
+        self.wndAvailableList = Apollo.LoadForm(self.xmlDoc, "PublicListForm", nil, self)
 
 		if self.wndMain == nil then
 			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.")
 			return
 		end
 
-        if self.wndPublicList == nil then
+        if self.wndAvailableList == nil then
             Apollo.AddAddonErrorText(self, "Could not load the show all window for some reason.")
             Print("error")
             return
         end
 
 	    self.wndMain:Show(false, true)
-        self.wndPublicList:Show(false, true)
+        self.wndAvailableList:Show(false, true)
 
 		-- if the xmlDoc is no longer needed, you should set it to nil
 		-- self.xmlDoc = nil
@@ -120,6 +125,7 @@ function HousingTour:OnDocLoaded()
         if self.tOptions.nAutoStop == nil then self.tOptions.nAutoStop = 1000 end
         self.wndMain:FindChild("SearchIntesityTextBox"):SetText(self.tOptions.nAutoStop)
         self.wndMain:FindChild('AutoStopSliderBar'):SetValue(self.tOptions.nAutoStop)
+
  	end
 end
 
@@ -201,7 +207,7 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
     
     -- Get strait to making public list.
     if strInputPlayer == "pl" then
-        self.wndPublicList:Show(true)
+        self.wndAvailableList:Show(true)
         self.strPlayerSearch = "pl"
         self.tPublicList = {}
         self.nTotalSearches = 0
@@ -246,6 +252,9 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
         if self.bTourOpt then
             self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your place!")
         end
+        
+        -- update history table                   { character, who you visited, relation }
+        self.tHistory[self:FormatCurrentTime()] = { GameLib.GetPlayerUnit():GetName(), GameLib.GetPlayerUnit():GetName(), "you" }
 
         return
 
@@ -267,6 +276,9 @@ function HousingTour:PropertySearch(strInputPlayer, bSilent)
                 if self.bTourOpt then
                     self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to your neighbor " .. tNeighbors[index].strCharacterName .. ".")
                 end
+                
+                -- update history table
+                self.tHistory[self:FormatCurrentTime()] = { GameLib.GetPlayerUnit():GetName(), tNeighbors[index].strCharacterName, "neighbor" }
 
                 return
             end
@@ -364,6 +376,10 @@ function HousingTour:PublicPropertySearch()
             if self.bTourOpt then
                 self.wndMain:FindChild("TourMsg"):SetText(self.strGuide .. " has sent the tour to " .. strPlayerFound .. "'s property.")
             end
+            
+            -- update history table
+            self.tHistory[self:FormatCurrentTime()] = { GameLib.GetPlayerUnit():GetName(), strPlayerFound, "public" }
+            
             return
         end
   	end
@@ -386,7 +402,7 @@ function HousingTour:PublicPropertySearch()
                 if(self.tOptions['bCmdLineOut']) then Print("Gave up searching for " .. self.strPlayerSearch .. ".") end
             else
                 self.wndMain:FindChild("StatusMsg"):SetText("Public list is done.")
-                self.wndPublicList:FindChild("PublicListWorking"):Show(false)
+                self.wndAvailableList:FindChild("PublicListWorking"):Show(false)
             end
 
             self.bFind = false
@@ -405,10 +421,10 @@ function HousingTour:PopulatePublicList(strSearchString)
     end
     
 	local bSearchString = string.len(strSearchString) > 0
-	self.wndPublicList:FindChild("SearchClearBtn"):Show(bSearchString)
+	self.wndAvailableList:FindChild("SearchClearBtn"):Show(bSearchString)
 
     -- Public list window.
-    local publicfound = self.wndPublicList:FindChild("PublicFound")
+    local publicfound = self.wndAvailableList:FindChild("PublicFound")
     
     -- Remove previous results.
     publicfound:DestroyChildren()
@@ -430,19 +446,19 @@ function HousingTour:PopulatePublicList(strSearchString)
     
     -- Populate public list window from temp array.
     for index, name in ipairs(self.arTemp) do
-        local wndPublicListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
+        local wndAvailableListItem = Apollo.LoadForm(self.xmlDoc, "PublicListItem", publicfound, self)
 
-        wndPublicListItem:FindChild("PublicListButton"):SetText(name)
-        wndPublicListItem:FindChild("PublicListButton"):SetTooltip(self.tPublicList[name].strResidenceName)
+        wndAvailableListItem:FindChild("PublicListButton"):SetText(name)
+        wndAvailableListItem:FindChild("PublicListButton"):SetTooltip(self.tPublicList[name].strResidenceName)
         if self.tPublicList[name].strRelation == "neighbor" then
-            wndPublicListItem:FindChild("StatusBox"):SetText("n")
-            wndPublicListItem:FindChild("StatusBox"):SetTooltip("This is your neighbor.")
+            wndAvailableListItem:FindChild("StatusBox"):SetText("n")
+            wndAvailableListItem:FindChild("StatusBox"):SetTooltip("This is your neighbor.")
         elseif self.tPublicList[name].strRelation == "yourself" then
-            wndPublicListItem:FindChild("StatusBox"):SetText("y")
-            wndPublicListItem:FindChild("StatusBox"):SetTooltip("This is you.")
+            wndAvailableListItem:FindChild("StatusBox"):SetText("y")
+            wndAvailableListItem:FindChild("StatusBox"):SetTooltip("This is you.")
         else
-            wndPublicListItem:FindChild("StatusBox"):SetText("p")
-            wndPublicListItem:FindChild("StatusBox"):SetTooltip("This property is public.")
+            wndAvailableListItem:FindChild("StatusBox"):SetText("p")
+            wndAvailableListItem:FindChild("StatusBox"):SetTooltip("This property is public.")
         end
     end
     
@@ -540,10 +556,27 @@ function HousingTour:ContextMenuCheck()
 end
 
 
+-- Returns useful time format as string
+function HousingTour:FormatCurrentTime()
+    local nYear = GameLib.GetLocalTime().nYear
+    local arMonths = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+    local strMonth = arMonths[GameLib.GetLocalTime().nMonth]
+    local nDay = GameLib.GetLocalTime().nDay
+    local strTime = GameLib.GetLocalTime().strFormattedTime
+    return strMonth .. " " .. nDay .. ", " .. nYear .. " " .. strTime
+end
+
+
+function HousingTour:OnChangeZoneName()
+    Print(GameLib.GetCurrentZoneMap().strName)
+end
+
 -- Save addon options, should always be called with 2.
 function HousingTour:OnSave(tSaveType)
+    local tSave = {}
     if tSaveType == GameLib.CodeEnumAddonSaveLevel.Account then
-        local tSave = self.tOptions
+        tSave.tOptions = self.tOptions
+        tSave.tHistory = self.tHistory
         return tSave
     else
         return
@@ -553,7 +586,8 @@ end
 
 -- Restore addon options.
 function HousingTour:OnRestore(tSaveType, tData)
-    self.tOptions = tData
+    self.tOptions = tData.tOptions
+    self.tHistory = tData.tHistory
 end
 
 
@@ -632,7 +666,7 @@ end
 
 -- When the "Public List" button is clicked.
 function HousingTour:OnPublicList()
-    self.wndPublicList:Invoke()
+    self.wndAvailableList:Invoke()
     self:PropertySearch("pl")
 end
 
@@ -668,7 +702,7 @@ end
 -----------------------------------------------------------------------------------------------
 -- When the close button is clicked on the public list window.
 function HousingTour:OnPublicListClose()
-    self.wndPublicList:Close()
+    self.wndAvailableList:Close()
 end
 
 -- Clicking on a name in the public list
@@ -689,7 +723,7 @@ end
 
 -- Typing in search box
 function HousingTour:OnSearchBoxChanged(wndHandler, wndControl)
-	self:PopulatePublicList(self.wndPublicList:FindChild("SearchBox"):GetText())
+	self:PopulatePublicList(self.wndAvailableList:FindChild("SearchBox"):GetText())
 end
 
 -- Clear search results
