@@ -26,7 +26,8 @@ Adds right click options **Tour Home** on other players and **Go Home** for you.
 
 Search for public property with `/ht <PlayerName>` (see below for full list of slash commands).
 
-**Public List** brings up a list of all public properties, visit them by click on player name.
+**The List** brings up a list of all properties you can go visit. Public properties are denoted with
+a "p", neighbors a "n", and "y" is yourself.
 
 #### Join a Tour
 **Important Notice**: This mod can automatically port you without notice _only if_ (1) you are in 
@@ -70,7 +71,7 @@ The following commands are available for anyone to use.
 * `/HousingTour <PlayerName>` Port you to PlayerName's public property.
 * `/ht <PlayerName>` Shorter version of previous command.
 * `/ht ~` Takes you home.
-* `/ht pl` Opens Public List.
+* `/ht al` or `/ht pl` Opens Available List.
 
 These commands are only for the tour guide.  
 
@@ -117,8 +118,10 @@ Please send feedback to <mailto:james@geekwagon.net>.
 * Public List now shows any property you have access to (like non-public neighbors and yourself).
 * Public List is searchable!
 
-
-
+#### 2014-??-?? | _v4 _
+* Changed Public List to Available List because it shows all properties you can visit (public 
+  properties, neighbors, and yourself). Slash command `/ht al` opens it but `/ht pl` still works.
+* Addon now tracks all the properties you've visited in a history table. 
 
 
   
