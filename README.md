@@ -26,8 +26,8 @@ Adds right click options **Tour Home** on other players and **Go Home** for you.
 
 Search for public property with `/ht <PlayerName>` (see below for full list of slash commands).
 
-**The List** brings up a list of all properties you can go visit. Public properties are denoted with
-a "p", neighbors a "n", and "y" is yourself.
+**The List** brings up a list of properties you can visit. Only shows **MEGASERVER** style names
+for now. Public properties are denoted with a "p", neighbors a "n", and you will be "y".
 
 #### Join a Tour
 **Important Notice**: This mod can automatically port you without notice _only if_ (1) you are in 
@@ -118,10 +118,15 @@ Please send feedback to <mailto:james@geekwagon.net>.
 * Public List now shows any property you have access to (like non-public neighbors and yourself).
 * Public List is searchable!
 
-#### 2014-??-?? | _v4 _
+#### 2014-10-18 | _v4 Limited time offer on hugs._
+* Modified to work on **MEGASERVER**!
+* Available list currently shows new style player names (but you can still go to old names with 
+  slash command).
 * Changed Public List to Available List because it shows all properties you can visit (public 
   properties, neighbors, and yourself). Slash command `/ht al` opens it but `/ht pl` still works.
-* Addon now tracks all the properties you've visited in a history table. 
+* History button shows the properties you've visited with KHT in a table. It's not pretty, but has
+  time and date.
+* Join Tour guide setting is _slightly_ more intuitive.
 
 
   

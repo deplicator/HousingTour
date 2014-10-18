@@ -322,6 +322,13 @@ function HousingTour:PublicPropertySearch()
             self.tAvailableList[strPlayerFound].strResidenceName = tResidences[i].strResidenceName
             self.tAvailableList[strPlayerFound].bPublic = true
             self.tAvailableList[strPlayerFound].strRelation = "none"
+            if string.find(tResidences[i].strCharacterName, " ") == nil
+            or string.byte(tResidences[i].strCharacterName) < 65
+            or string.byte(tResidences[i].strCharacterName) > 122 then
+                self.tAvailableList[strPlayerFound].old = true
+            else 
+                self.tAvailableList[strPlayerFound].old = false
+            end
             
             -- If relation to neighbor if they are a neighbor.
             for index = 1, #tNeighbors do
@@ -450,10 +457,14 @@ function HousingTour:PopulateAvailableList(strSearchString)
     
     -- Populate temp array with correct order and limited by search string.
     for key in pairs(self.tAvailableList) do
-        if bSearchString and key:lower():find(strSearchString:lower(), 1, true) then
-            table.insert(self.arTemp, key)
-        elseif not bSearchString then
-            table.insert(self.arTemp, key)
+        
+        -- for now we're ignoring old names and weird characters
+        if self.tAvailableList[key].old == false then
+            if bSearchString and key:lower():find(strSearchString:lower(), 1, true) then
+                table.insert(self.arTemp, key)
+            elseif not bSearchString then
+                table.insert(self.arTemp, key)
+            end
         end
     end
     
@@ -690,7 +701,7 @@ end
 -- When "Join a Tour" is checked.
 function HousingTour:OnTourOptIn()
     self.wndMain:FindChild("GuideTextBox"):SetText(self.strGuide)
-    self.wndMain:FindChild("ChangeGuideBtnBlock"):Show(false)
+    self.wndMain:FindChild("ChangeGuideBtn"):Show(true)
     self.bTourOpt = true
     if self.strGuide == "" then
         self.wndMain:FindChild("TourMsg"):SetText("You must choose a tour guide.")
@@ -703,7 +714,8 @@ end
 function HousingTour:OnTourOptOut()
     self.strGuide = ""
     self.wndMain:FindChild("GuideTextBox"):SetText("")
-    self.wndMain:FindChild("ChangeGuideBtnBlock"):Show(true)
+    self.wndMain:FindChild("ChangeGuideBtn"):Show(false)
+    self.wndMain:FindChild("ChangeGuideBtn"):SetText("Set Guide")
     self.bTourOpt = false
     self.wndMain:FindChild("TourMsg"):SetText("")
 end
@@ -713,7 +725,7 @@ function HousingTour:OnChangeGuide()
     self.wndMain:FindChild("ChangeGuideForm"):Show(true)
 
     if self.strGuide == "" then
-        self.wndMain:FindChild("ChangeGuideBox"):SetText("Kaelish")
+        self.wndMain:FindChild("ChangeGuideBox"):SetText("Kaelish Brightsky")
     else
         self.wndMain:FindChild("ChangeGuideBox"):SetText(self.strGuide)
     end
@@ -725,6 +737,9 @@ function HousingTour:OnGuideChangeSubmit()
     self.wndMain:FindChild("GuideTextBox"):SetText(self.strGuide)
     self.wndMain:FindChild("ChangeGuideForm"):Show(false)
     self.wndMain:FindChild("TourMsg"):SetText("You will be ported to public housing with " .. self.strGuide .. ".")
+    if self.wndMain:FindChild("GuideTextBox"):GetText() ~= nil then
+        self.wndMain:FindChild("ChangeGuideBtn"):SetText("Change Guide")
+    end
 end
 
 -- When the "Change Guide Close" button is clicked.
